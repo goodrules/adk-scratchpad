@@ -1,0 +1,2 @@
+# adk-scratchpad
+
