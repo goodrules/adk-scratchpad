@@ -181,3 +181,6 @@ cython_debug/
 .cursorindexingignore
 
 .claude
+workspace
+.adk
+uv.lock
