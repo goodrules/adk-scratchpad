@@ -18,7 +18,7 @@ def exit_loop(tool_context: ToolContext):
 # This agent refines the story based on critique OR calls the exit_loop function.
 refiner_agent = Agent(
     name="RefinerAgent",
-    model="gemini-2.5-pro",
+    model="gemini-3-flash-preview",
     instruction="""You are a skilled story refiner who transforms good drafts into excellent stories. You have a story draft and editorial feedback to work with.
 
     Story Draft: {current_story}

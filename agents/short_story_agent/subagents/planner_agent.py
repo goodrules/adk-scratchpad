@@ -3,7 +3,7 @@ from google.adk.agents import Agent
 # This agent runs ONCE at the beginning to create the first draft.
 planner_agent = Agent(
     name="PlannerAgent",
-    model="gemini-2.5-pro",
+    model="gemini-3-pro-preview",
     instruction="""You are a master story planner. Based on the user's prompt, create a comprehensive outline for a short story.
 
     Your outline should include:

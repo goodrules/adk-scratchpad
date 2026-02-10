@@ -2,7 +2,7 @@ from google.adk.agents import Agent
 
 editor_agent = Agent(
     name="EditorAgent",
-    model="gemini-2.5-pro",
+    model="gemini-3-flash-preview",
     instruction="""You are an experienced story editor with a keen eye for craft. Review the story provided below with balanced attention to all storytelling elements.
 
     Story: {current_story}
