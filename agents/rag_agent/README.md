@@ -99,7 +99,7 @@ flowchart TD
     Follow the steps in the file to set up the environment variables.
 
 4. **Setup Corpus:**
-    If you have an existing corpus in Vertex AI RAG Engine, please set corpus information in your .env file. For example: RAG_CORPUS='projects/123/locations/us-central1/ragCorpora/456'.
+    If you have an existing corpus in Vertex AI RAG Engine, please set corpus information in your .env file. For example: RAG_CORPUS='projects/123/locations/global/ragCorpora/456'.
 
     If you don't have a corpus setup yet, please follow "How to upload my file to my RAG corpus" section. The `prepare_corpus_and_data.py` script will automatically create a corpus (if needed) and update the `RAG_CORPUS` variable in your `.env` file with the resource name of the created or retrieved corpus.
 
@@ -116,7 +116,7 @@ The `rag/shared_libraries/prepare_corpus_and_data.py` script helps you set up a 
     Ensure your `.env` file (copied from `.env.example`) has the following variables set:
     ```
     GOOGLE_CLOUD_PROJECT=your-project-id
-    GOOGLE_CLOUD_LOCATION=your-location  # e.g., us-central1
+    GOOGLE_CLOUD_LOCATION=your-location  # e.g., global
     ```
 
 3.  **Configure and run the preparation script:**

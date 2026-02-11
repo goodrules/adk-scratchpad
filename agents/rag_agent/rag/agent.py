@@ -51,3 +51,7 @@ root_agent = LoopAgent(
     ],
     max_iterations=1,
 )
+
+from google.adk.apps import App
+
+app = App(root_agent=root_agent, name="rag")
