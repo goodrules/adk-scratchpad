@@ -188,5 +188,3 @@ workspace
 .adk
 uv.lock
 data/
-agents/deep-search
-agents-wip

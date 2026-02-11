@@ -14,6 +14,9 @@
 
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import google.auth
 
 _, project_id = google.auth.default()

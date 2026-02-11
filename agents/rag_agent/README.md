@@ -35,7 +35,20 @@ The final answer includes citations pointing back to source documentation URLs.
 | **Vertical**      | Horizontal                                                                                                                                                                               |
 ### Agent Architecture
 
-![RAG](RAG_workflow.png)
+```mermaid
+flowchart TD
+    A[User Query] --> B[LoopAgent: rag_with_search_fallback]
+    B --> C[RAG Retrieval Agent]
+    C -- "retrieve_rag_documentation tool\n(VertexAiRagRetrieval, top_k=10)" --> D[Vertex AI RAG Corpus]
+    D --> C
+    C -- "output → state:rag_answer" --> E[Answer Evaluator Agent]
+    E -- "Evaluates rag_answer quality" --> F{RAG Answer\nSufficient?}
+    F -- "Yes: calls skip_search tool\n(sets escalate=True)" --> G[Return RAG Answer]
+    F -- "No: passes through\n(incomplete/uncertain/hedging)" --> H[Search Enrichment Agent]
+    H -- "google_search tool" --> I[Google Search]
+    I --> H
+    H -- "output → state:final_answer" --> J[Return Enriched Answer]
+```
 
 
 ### Key Features

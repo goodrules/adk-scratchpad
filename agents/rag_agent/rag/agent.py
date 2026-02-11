@@ -34,17 +34,12 @@ Architecture:
 """
 
 from google.adk.agents import LoopAgent
-from dotenv import load_dotenv
 
-from rag.tracing import instrument_adk_with_arize
 from rag.subagents import (
     rag_retrieval_agent,
     answer_evaluator_agent,
     search_enrichment_agent,
 )
-
-load_dotenv()
-_ = instrument_adk_with_arize()
 
 
 root_agent = LoopAgent(

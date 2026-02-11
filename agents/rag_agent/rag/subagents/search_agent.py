@@ -14,6 +14,8 @@
 
 """Search enrichment subagent that uses Google Search when RAG is insufficient."""
 
+import os
+
 from google.adk.agents import Agent
 from google.adk.tools import google_search
 
@@ -22,7 +24,7 @@ from rag.prompts import return_instructions_search_enrichment
 
 search_enrichment_agent = Agent(
     name='search_enrichment_agent',
-    model='gemini-2.0-flash',
+    model=os.environ.get("MODEL_ID", "gemini-2.5-flash"),
     instruction=return_instructions_search_enrichment(),
     tools=[google_search],
     output_key='final_answer',

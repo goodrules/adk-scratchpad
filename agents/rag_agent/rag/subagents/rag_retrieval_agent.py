@@ -47,7 +47,7 @@ ask_vertex_retrieval = VertexAiRagRetrieval(
 
 rag_retrieval_agent = Agent(
     name='rag_retrieval_agent',
-    model='gemini-2.0-flash',
+    model=os.environ.get("MODEL_ID", "gemini-2.5-flash"),
     instruction=return_instructions_rag_retrieval(),
     tools=[ask_vertex_retrieval],
     output_key='rag_answer',

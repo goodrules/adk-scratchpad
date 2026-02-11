@@ -14,6 +14,8 @@
 
 """Evaluator subagent that decides whether RAG answer is sufficient or needs search."""
 
+import os
+
 from google.adk.agents import Agent
 
 from rag.prompts import return_instructions_evaluator
@@ -22,7 +24,7 @@ from rag.tools import skip_search
 
 answer_evaluator_agent = Agent(
     name='answer_evaluator_agent',
-    model='gemini-2.0-flash',
+    model=os.environ.get("MODEL_ID", "gemini-2.5-flash"),
     instruction=return_instructions_evaluator(),
     tools=[skip_search],
     output_key='evaluation',
