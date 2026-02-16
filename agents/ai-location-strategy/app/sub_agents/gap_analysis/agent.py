@@ -24,6 +24,7 @@ from google.genai import types
 
 from ...callbacks import after_gap_analysis, before_gap_analysis
 from ...config import CODE_EXEC_MODEL, RETRY_ATTEMPTS, RETRY_INITIAL_DELAY
+from ...prompt_utils import make_instruction_provider
 
 GAP_ANALYSIS_INSTRUCTION_RETAIL = """You are a data scientist analyzing market opportunities using quantitative methods.
 
@@ -210,7 +211,7 @@ gap_analysis_agent = LlmAgent(
     name="GapAnalysisAgent",
     model=CODE_EXEC_MODEL,
     description="Performs quantitative gap analysis using Python code execution for zone rankings and viability scores",
-    instruction=GAP_ANALYSIS_INSTRUCTION_DATACENTER,
+    instruction=make_instruction_provider(GAP_ANALYSIS_INSTRUCTION_RETAIL, GAP_ANALYSIS_INSTRUCTION_DATACENTER),
     generate_content_config=types.GenerateContentConfig(
         http_options=types.HttpOptions(
             retry_options=types.HttpRetryOptions(

@@ -51,6 +51,7 @@ from google.adk.agents.llm_agent import Agent
 from google.adk.tools.agent_tool import AgentTool
 
 from .config import APP_NAME, FAST_MODEL
+from .prompt_utils import make_instruction_provider
 from .sub_agents.competitor_mapping.agent import competitor_mapping_agent
 from .sub_agents.gap_analysis.agent import gap_analysis_agent
 from .sub_agents.infographic_generator.agent import infographic_generator_agent
@@ -59,14 +60,30 @@ from .sub_agents.market_research.agent import market_research_agent
 from .sub_agents.report_generator.agent import report_generator_agent
 from .sub_agents.strategy_advisor.agent import strategy_advisor_agent
 
+ROOT_INSTRUCTION_RETAIL = """Your primary role is to orchestrate the retail location strategy analysis.
+1. Start by greeting the user.
+2. Check if the `TARGET_LOCATION` (Geographic area to analyze (e.g., "Indiranagar, Bangalore", "Mission District, San Francisco")) and `BUSINESS_TYPE` (Type of business to open (e.g., "coffee shop", "bakery", "gym", "restaurant")) have been provided.
+3. If they are missing, **ask the user clarifying questions to get the required information.** Ask about target neighborhood, business type, and any specific requirements.
+4. Once you have the necessary details, call the `IntakeAgent` tool to process them.
+5. After the `IntakeAgent` is successful, delegate the full analysis to the `LocationStrategyPipeline`.
+Your main function is to manage this workflow conversationally."""
+
+ROOT_INSTRUCTION_DATACENTER = """Your primary role is to orchestrate the data center site selection analysis.
+1. Start by greeting the user.
+2. Check if the `TARGET_LOCATION` (Geographic region to analyze (e.g., "Northern Virginia", "Dallas-Fort Worth, Texas")) and `BUSINESS_TYPE` (Type of facility (e.g., "hyperscale data center", "colocation facility", "edge data center")) have been provided.
+3. If they are missing, **ask the user clarifying questions to get the required information.** Ask about target region, facility type, and any power/capacity requirements.
+4. Once you have the necessary details, call the `IntakeAgent` tool to process them.
+5. After the `IntakeAgent` is successful, delegate the full analysis to the `LocationStrategyPipeline`.
+Your main function is to manage this workflow conversationally."""
+
 # location_strategy_pipeline
 location_strategy_pipeline = SequentialAgent(
     name="LocationStrategyPipeline",
-    description="""Comprehensive retail location strategy analysis pipeline.
+    description="""Comprehensive location strategy analysis pipeline.
 
-This agent analyzes a target location for a specific business type and produces:
+This agent analyzes a target location for a specific business or facility type and produces:
 1. Market research findings from live web data
-2. Competitor mapping from Google Maps Places API
+2. Competitor/facility mapping from Google Maps Places API
 3. Quantitative gap analysis with zone rankings
 4. Strategic recommendations with structured JSON output
 5. Professional HTML executive report
@@ -93,14 +110,8 @@ including JSON report, HTML report, and infographic image.
 root_agent = Agent(
     model=FAST_MODEL,
     name=APP_NAME,
-    description="A strategic partner for data center site selection, guiding operators and developers to optimal locations for data center deployment based on power, connectivity, cost, and risk factors.",
-    instruction="""Your primary role is to orchestrate the data center site selection analysis.
-1. Start by greeting the user.
-2. Check if the `TARGET_LOCATION` (Geographic region to analyze (e.g., "Northern Virginia", "Dallas-Fort Worth, Texas")) and `BUSINESS_TYPE` (Type of facility (e.g., "hyperscale data center", "colocation facility", "edge data center")) have been provided.
-3. If they are missing, **ask the user clarifying questions to get the required information.** Ask about target region, facility type, and any power/capacity requirements.
-4. Once you have the necessary details, call the `IntakeAgent` tool to process them.
-5. After the `IntakeAgent` is successful, delegate the full analysis to the `LocationStrategyPipeline`.
-Your main function is to manage this workflow conversationally.""",
+    description="A strategic partner for location strategy analysis, guiding users to optimal locations for their business or facility based on market data, competition, infrastructure, and risk factors.",
+    instruction=make_instruction_provider(ROOT_INSTRUCTION_RETAIL, ROOT_INSTRUCTION_DATACENTER),
     sub_agents=[location_strategy_pipeline],
     tools=[AgentTool(intake_agent)],  # Part 0: Parse user request
 )

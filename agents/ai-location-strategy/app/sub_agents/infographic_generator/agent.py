@@ -26,6 +26,7 @@ from ...callbacks import (
     before_infographic_generator,
 )
 from ...config import FAST_MODEL, RETRY_ATTEMPTS, RETRY_INITIAL_DELAY
+from ...prompt_utils import make_instruction_provider
 from ...tools import generate_infographic
 
 INFOGRAPHIC_GENERATOR_INSTRUCTION_RETAIL = """You are a data visualization specialist creating executive-ready infographics.
@@ -185,7 +186,7 @@ infographic_generator_agent = LlmAgent(
     name="InfographicGeneratorAgent",
     model=FAST_MODEL,
     description="Generates visual infographic summary using Gemini image generation",
-    instruction=INFOGRAPHIC_GENERATOR_INSTRUCTION_DATACENTER,
+    instruction=make_instruction_provider(INFOGRAPHIC_GENERATOR_INSTRUCTION_RETAIL, INFOGRAPHIC_GENERATOR_INSTRUCTION_DATACENTER),
     generate_content_config=types.GenerateContentConfig(
         http_options=types.HttpOptions(
             retry_options=types.HttpRetryOptions(

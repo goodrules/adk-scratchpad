@@ -24,6 +24,7 @@ export default function RootLayout({
         <CopilotKit
           runtimeUrl="/api/copilotkit"
           agent="ai_location_strategy"
+          showDevConsole={false}
         >
           {children}
         </CopilotKit>

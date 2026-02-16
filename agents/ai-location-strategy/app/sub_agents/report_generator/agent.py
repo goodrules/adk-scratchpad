@@ -27,6 +27,7 @@ from google.genai import types
 
 from ...callbacks import after_report_generator, before_report_generator
 from ...config import FAST_MODEL, RETRY_ATTEMPTS, RETRY_INITIAL_DELAY
+from ...prompt_utils import make_instruction_provider
 from ...tools import generate_html_report
 
 REPORT_GENERATOR_INSTRUCTION_RETAIL = """You are an executive report generator for location intelligence analysis.
@@ -116,7 +117,7 @@ report_generator_agent = LlmAgent(
     name="ReportGeneratorAgent",
     model=FAST_MODEL,
     description="Generates professional McKinsey/BCG-style HTML executive reports using the generate_html_report tool",
-    instruction=REPORT_GENERATOR_INSTRUCTION_DATACENTER,
+    instruction=make_instruction_provider(REPORT_GENERATOR_INSTRUCTION_RETAIL, REPORT_GENERATOR_INSTRUCTION_DATACENTER),
     generate_content_config=types.GenerateContentConfig(
         http_options=types.HttpOptions(
             retry_options=types.HttpRetryOptions(

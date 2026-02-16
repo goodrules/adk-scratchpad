@@ -23,6 +23,7 @@ from google.genai import types
 
 from ...callbacks import after_competitor_mapping, before_competitor_mapping
 from ...config import FAST_MODEL, RETRY_ATTEMPTS, RETRY_INITIAL_DELAY
+from ...prompt_utils import make_instruction_provider
 from ...tools import search_places
 
 COMPETITOR_MAPPING_INSTRUCTION_RETAIL = """You are a market intelligence analyst specializing in competitive landscape analysis.
@@ -161,7 +162,7 @@ competitor_mapping_agent = LlmAgent(
     name="CompetitorMappingAgent",
     model=FAST_MODEL,
     description="Maps competitors using Google Maps Places API for ground-truth competitor data",
-    instruction=COMPETITOR_MAPPING_INSTRUCTION_DATACENTER,
+    instruction=make_instruction_provider(COMPETITOR_MAPPING_INSTRUCTION_RETAIL, COMPETITOR_MAPPING_INSTRUCTION_DATACENTER),
     generate_content_config=types.GenerateContentConfig(
         http_options=types.HttpOptions(
             retry_options=types.HttpRetryOptions(

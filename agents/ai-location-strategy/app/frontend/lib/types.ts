@@ -123,6 +123,9 @@ export type PipelineStage =
  * These fields are set by the existing callbacks in pipeline_callbacks.py
  */
 export interface AgentState {
+  // Prompt style (set by frontend dropdown, read by backend instruction providers)
+  prompt_style?: "retail" | "datacenter";
+
   // Pipeline tracking (set by before_*/after_* callbacks)
   pipeline_stage: PipelineStage | string;
   stages_completed: string[];

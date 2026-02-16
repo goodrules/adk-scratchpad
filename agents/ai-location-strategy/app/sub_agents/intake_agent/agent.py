@@ -25,6 +25,7 @@ from google.genai import types
 from pydantic import BaseModel, Field
 
 from ...config import FAST_MODEL, RETRY_ATTEMPTS, RETRY_INITIAL_DELAY
+from ...prompt_utils import make_instruction_provider
 
 
 class UserRequest(BaseModel):
@@ -140,7 +141,7 @@ intake_agent = LlmAgent(
     name="IntakeAgent",
     model=FAST_MODEL,
     description="Parses user request to extract target location and facility/business type",
-    instruction=INTAKE_INSTRUCTION_DATACENTER,
+    instruction=make_instruction_provider(INTAKE_INSTRUCTION_RETAIL, INTAKE_INSTRUCTION_DATACENTER),
     generate_content_config=types.GenerateContentConfig(
         http_options=types.HttpOptions(
             retry_options=types.HttpRetryOptions(

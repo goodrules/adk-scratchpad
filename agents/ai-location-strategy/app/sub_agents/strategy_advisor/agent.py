@@ -25,6 +25,7 @@ from google.genai.types import ThinkingConfig
 
 from ...callbacks import after_strategy_advisor, before_strategy_advisor
 from ...config import PRO_MODEL, RETRY_ATTEMPTS, RETRY_INITIAL_DELAY
+from ...prompt_utils import make_instruction_provider
 from ...schemas import LocationIntelligenceReport
 
 STRATEGY_ADVISOR_INSTRUCTION_RETAIL = """You are a senior strategy consultant synthesizing location intelligence findings.
@@ -190,7 +191,7 @@ strategy_advisor_agent = LlmAgent(
     name="StrategyAdvisorAgent",
     model=PRO_MODEL,
     description="Synthesizes findings into strategic recommendations using extended reasoning and structured output",
-    instruction=STRATEGY_ADVISOR_INSTRUCTION_DATACENTER,
+    instruction=make_instruction_provider(STRATEGY_ADVISOR_INSTRUCTION_RETAIL, STRATEGY_ADVISOR_INSTRUCTION_DATACENTER),
     generate_content_config=types.GenerateContentConfig(
         http_options=types.HttpOptions(
             retry_options=types.HttpRetryOptions(

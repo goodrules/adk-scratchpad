@@ -24,6 +24,7 @@ from google.genai import types
 
 from ...callbacks import after_market_research, before_market_research
 from ...config import FAST_MODEL, RETRY_ATTEMPTS, RETRY_INITIAL_DELAY
+from ...prompt_utils import make_instruction_provider
 
 MARKET_RESEARCH_INSTRUCTION_RETAIL = """You are a market research analyst specializing in retail location intelligence.
 
@@ -130,7 +131,7 @@ market_research_agent = LlmAgent(
     name="MarketResearchAgent",
     model=FAST_MODEL,
     description="Researches market viability using Google Search for real-time demographics, trends, and commercial data",
-    instruction=MARKET_RESEARCH_INSTRUCTION_DATACENTER,
+    instruction=make_instruction_provider(MARKET_RESEARCH_INSTRUCTION_RETAIL, MARKET_RESEARCH_INSTRUCTION_DATACENTER),
     generate_content_config=types.GenerateContentConfig(
         http_options=types.HttpOptions(
             retry_options=types.HttpRetryOptions(
