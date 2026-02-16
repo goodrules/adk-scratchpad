@@ -7,10 +7,10 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Retail AI Location Strategy",
+  title: "AI Location Strategy",
   description:
-    "AI-powered retail site selection and location intelligence with Google ADK + Gemini 3",
-  keywords: ["retail", "location strategy", "AI", "Google ADK", "Gemini"],
+    "AI-powered site selection and location intelligence with Google ADK + Gemini 3",
+  keywords: ["site selection", "location strategy", "AI", "Google ADK", "Gemini", "data center"],
 };
 
 export default function RootLayout({

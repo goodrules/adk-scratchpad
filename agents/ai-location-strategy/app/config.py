@@ -33,8 +33,13 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Load environment variables from .env file in the app directory
-env_path = Path(__file__).parent / ".env"
+# Load environment variables from .env file
+app_dir = Path(__file__).parent
+project_root = app_dir.parent
+# Try project root .env first, then app/.env as fallback
+env_path = project_root / ".env"
+if not env_path.exists():
+    env_path = app_dir / ".env"
 load_dotenv(dotenv_path=env_path)
 
 # Detect authentication mode from environment

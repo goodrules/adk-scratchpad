@@ -45,7 +45,7 @@ export default function Home() {
       // Show simplified progress indicator in chat
       const stageLabels: Record<string, string> = {
         market_research: "Researching market trends...",
-        competitor_mapping: "Mapping competitors...",
+        competitor_mapping: "Mapping facilities...",
         gap_analysis: "Analyzing market gaps...",
         strategy_synthesis: "Synthesizing strategy...",
         report_generation: "Generating executive report...",
@@ -76,15 +76,15 @@ export default function Home() {
       defaultOpen={true}
       clickOutsideToClose={false}
       labels={{
-        title: "Retail Location Strategy",
+        title: "Location Strategy",
         initial: `Hi! I'm your AI-powered location strategy assistant.
 
-Tell me where you want to open your business and I'll analyze the market, map competitors, and provide strategic recommendations.
+Tell me about your site selection needs and I'll analyze the market, map facilities, and provide strategic recommendations.
 
 **Try these examples:**
-- "I want to open a coffee shop in Indiranagar, Bangalore"
-- "Analyze Austin, Texas for a fitness studio"
-- "Where should I open a bakery in Dubai Marina?"`,
+- "I want to build a 50MW hyperscale data center in Northern Virginia"
+- "Analyze the Dallas-Fort Worth metro for colocation facilities"
+- "Where should I deploy edge data centers in Phoenix, Arizona?"`,
       }}
     >
       <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -92,7 +92,7 @@ Tell me where you want to open your business and I'll analyze the market, map co
           {/* Header */}
           <header className="mb-8">
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
-              Retail AI Location Strategy
+              AI Location Strategy
             </h1>
             <p className="text-gray-600">
               Powered by Google ADK + Gemini 3 | Multi-Agent Pipeline
@@ -165,31 +165,31 @@ Tell me where you want to open your business and I'll analyze the market, map co
           {/* Welcome state - shown when no analysis is in progress */}
           {!state?.target_location && (
             <div className="bg-white rounded-xl shadow-sm border p-12 text-center">
-              <div className="text-7xl mb-6">🏪</div>
+              <div className="text-7xl mb-6">🌐</div>
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Find Your Perfect Location
+                Find Your Optimal Site
               </h2>
               <p className="text-gray-600 max-w-lg mx-auto mb-8 text-lg">
-                Tell me where you want to open your business in the chat, and
+                Describe your site selection needs in the chat, and
                 I'll run a comprehensive analysis using live market data,
-                competitor mapping, and AI-powered strategy recommendations.
+                facility mapping, and AI-powered strategy recommendations.
               </p>
 
               <div className="grid md:grid-cols-3 gap-4 max-w-2xl mx-auto">
                 <FeatureCard
                   icon="🔍"
                   title="Market Research"
-                  description="Live web search for market trends and demographics"
+                  description="Live web search for market data and regional analysis"
                 />
                 <FeatureCard
                   icon="📍"
-                  title="Competitor Mapping"
-                  description="Google Maps API for real competitor locations"
+                  title="Facility Mapping"
+                  description="Google Maps API for real facility and competitor locations"
                 />
                 <FeatureCard
                   icon="🧠"
                   title="AI Strategy"
-                  description="Extended reasoning for strategic recommendations"
+                  description="Extended reasoning for strategic site recommendations"
                 />
               </div>
             </div>

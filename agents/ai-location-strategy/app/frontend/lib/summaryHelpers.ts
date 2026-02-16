@@ -48,20 +48,20 @@ export function summarizeCompetitorAnalysis(
     const highPerformers = rec.competition?.high_performers_count ?? 0;
     const avgRating = rec.competition?.avg_competitor_rating?.toFixed(1) ?? "N/A";
 
-    return `Found ${total} competitors \u2022 ${highPerformers} high-performers \u2022 ${avgRating} avg rating`;
+    return `Found ${total} facilities \u2022 ${highPerformers} high-performers \u2022 ${avgRating} avg rating`;
   }
 
   // Fallback: extract numbers from raw analysis if present
   if (analysis) {
     // Look for patterns like "Found X competitors"
-    const competitorMatch = analysis.match(/(\d+)\s*(competitors?|businesses?|locations?)/i);
-    if (competitorMatch) {
-      return `Found ${competitorMatch[1]} ${competitorMatch[2].toLowerCase()}`;
+    const facilityMatch = analysis.match(/(\d+)\s*(facilities|competitors?|businesses?|locations?)/i);
+    if (facilityMatch) {
+      return `Found ${facilityMatch[1]} ${facilityMatch[2].toLowerCase()}`;
     }
     return truncateText(analysis, 100);
   }
 
-  return "Mapping competitors...";
+  return "Mapping facilities...";
 }
 
 /**

@@ -93,11 +93,11 @@ including JSON report, HTML report, and infographic image.
 root_agent = Agent(
     model=FAST_MODEL,
     name=APP_NAME,
-    description="A strategic partner for retail businesses, guiding them to optimal physical locations that foster growth and profitability.",
-    instruction="""Your primary role is to orchestrate the retail location analysis.
+    description="A strategic partner for data center site selection, guiding operators and developers to optimal locations for data center deployment based on power, connectivity, cost, and risk factors.",
+    instruction="""Your primary role is to orchestrate the data center site selection analysis.
 1. Start by greeting the user.
-2. Check if the `TARGET_LOCATION` (Geographic area to analyze (e.g., "Indiranagar, Bangalore")) and `BUSINESS_TYPE` (Type of business (e.g., "coffee shop", "bakery", "gym")) have been provided.
-3. If they are missing, **ask the user clarifying questions to get the required information.**
+2. Check if the `TARGET_LOCATION` (Geographic region to analyze (e.g., "Northern Virginia", "Dallas-Fort Worth, Texas")) and `BUSINESS_TYPE` (Type of facility (e.g., "hyperscale data center", "colocation facility", "edge data center")) have been provided.
+3. If they are missing, **ask the user clarifying questions to get the required information.** Ask about target region, facility type, and any power/capacity requirements.
 4. Once you have the necessary details, call the `IntakeAgent` tool to process them.
 5. After the `IntakeAgent` is successful, delegate the full analysis to the `LocationStrategyPipeline`.
 Your main function is to manage this workflow conversationally.""",

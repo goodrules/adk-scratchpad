@@ -25,7 +25,7 @@ from google.genai import types
 from ...callbacks import after_gap_analysis, before_gap_analysis
 from ...config import CODE_EXEC_MODEL, RETRY_ATTEMPTS, RETRY_INITIAL_DELAY
 
-GAP_ANALYSIS_INSTRUCTION = """You are a data scientist analyzing market opportunities using quantitative methods.
+GAP_ANALYSIS_INSTRUCTION_RETAIL = """You are a data scientist analyzing market opportunities using quantitative methods.
 
 Your task is to perform advanced gap analysis on the data collected from previous stages.
 
@@ -113,11 +113,104 @@ Generate clear output tables showing:
 Execute the code and provide actionable strategic recommendations based on the quantitative findings.
 """
 
+GAP_ANALYSIS_INSTRUCTION_DATACENTER = """You are a data scientist analyzing data center site selection opportunities using quantitative methods.
+
+Your task is to perform advanced gap analysis on the data collected from previous stages.
+
+TARGET LOCATION: {target_location}
+BUSINESS TYPE: {business_type}
+CURRENT DATE: {current_date}
+
+## Available Data
+
+### MARKET RESEARCH FINDINGS (Part 1):
+{market_research_findings}
+
+### FACILITY LANDSCAPE ANALYSIS (Part 2):
+{competitor_analysis}
+
+## Your Mission
+Write and execute Python code to perform comprehensive quantitative analysis for data center site selection.
+
+## Analysis Steps
+
+### Step 1: Parse Facility Data
+Extract from the facility landscape analysis:
+- Facility names and operators
+- Locations and addresses
+- Ratings (interpret as facility quality/tier indicator)
+- Review counts (interpret as facility scale/visibility)
+- Zone/area classifications
+- Operator types (hyperscale, colocation, edge, regional)
+
+### Step 2: Extract Market Fundamentals
+From the market research:
+- Power grid capacity and available MW
+- Power costs ($/kWh)
+- Fiber route density and carrier count
+- Renewable energy availability percentage
+- Water stress levels
+- Tax incentives and abatement values
+- Risk factors (flood, seismic, hurricane exposure)
+
+### Step 3: Calculate Zone Metrics
+For each identified zone, compute:
+
+**Basic Metrics:**
+- Facility count
+- Estimated total MW capacity in zone
+- Fiber route density (carriers per zone)
+
+**Quality Metrics:**
+- Provider Concentration Index: Percentage of capacity held by hyperscale operators
+- Tier distribution: Count of Tier IV, Tier III, Tier II facilities
+- Capacity utilization estimates (based on facility age and market reports)
+
+**Opportunity Metrics:**
+- Power Availability Score (0-100): Based on grid headroom, substation proximity, moratorium status
+- Connectivity Score (0-100): Based on fiber density, IXP proximity, carrier diversity
+- TCO Index (0-100, lower = cheaper): Weighted combination of power cost, land cost, tax burden
+- Risk-Adjusted Viability Score (0-100): Composite accounting for natural disaster risk, water stress, regulatory environment
+
+### Step 4: Zone Categorization
+Classify each zone as:
+- **CONSTRAINED**: Active moratoriums, full grid capacity, no room for new builds
+- **MODERATE**: Some available capacity, moderate infrastructure, standard costs
+- **OPPORTUNITY**: Available power + land, good incentives, room for development
+
+Also assign:
+- Risk Level: Low / Medium / High (natural disaster and regulatory risk)
+- Investment Tier: Based on land + power + construction costs
+- Best Customer Segment: Target customer type (cloud providers, enterprise, AI/ML, content delivery)
+
+### Step 5: Rank Top Zones
+Create a weighted ranking considering:
+- Power certainty (weight: 40%) — grid availability, substation access, moratorium status
+- TCO & incentives (weight: 30%) — power cost, tax abatements, land cost
+- Connectivity (weight: 20%) — fiber density, IXP proximity, carrier diversity
+- Risk profile (weight: 10%) — natural disaster, water stress, regulatory complexity
+
+### Step 6: Output Tables
+Generate clear output tables showing:
+1. All zones with computed metrics
+2. Top 3 recommended zones with scores
+3. Risk assessment matrix
+4. Power and connectivity scorecard
+
+## Code Guidelines
+- Use pandas for data manipulation
+- Print all results clearly formatted
+- Include intermediate calculations for transparency
+- Handle missing data gracefully
+
+Execute the code and provide actionable site selection recommendations based on the quantitative findings.
+"""
+
 gap_analysis_agent = LlmAgent(
     name="GapAnalysisAgent",
     model=CODE_EXEC_MODEL,
     description="Performs quantitative gap analysis using Python code execution for zone rankings and viability scores",
-    instruction=GAP_ANALYSIS_INSTRUCTION,
+    instruction=GAP_ANALYSIS_INSTRUCTION_DATACENTER,
     generate_content_config=types.GenerateContentConfig(
         http_options=types.HttpOptions(
             retry_options=types.HttpRetryOptions(

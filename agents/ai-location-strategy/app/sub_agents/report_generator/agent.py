@@ -29,7 +29,7 @@ from ...callbacks import after_report_generator, before_report_generator
 from ...config import FAST_MODEL, RETRY_ATTEMPTS, RETRY_INITIAL_DELAY
 from ...tools import generate_html_report
 
-REPORT_GENERATOR_INSTRUCTION = """You are an executive report generator for location intelligence analysis.
+REPORT_GENERATOR_INSTRUCTION_RETAIL = """You are an executive report generator for location intelligence analysis.
 
 Your task is to create a professional HTML executive report using the generate_html_report tool.
 
@@ -69,11 +69,54 @@ After the tool returns, confirm the report was generated successfully.
 If there was an error, report what went wrong.
 """
 
+REPORT_GENERATOR_INSTRUCTION_DATACENTER = """You are an executive report generator for data center site selection analysis.
+
+Your task is to create a professional HTML executive report using the generate_html_report tool.
+
+TARGET LOCATION: {target_location}
+BUSINESS TYPE: {business_type}
+CURRENT DATE: {current_date}
+
+## Strategic Report Data
+{strategic_report}
+
+## Your Mission
+Format the strategic report data and call the generate_html_report tool to create a
+McKinsey/BCG-style 7-slide HTML presentation titled "Data Center Site Selection Report".
+
+## Steps
+
+### Step 1: Format the Report Data
+Prepare a comprehensive data summary from the strategic report above, including:
+- Analysis overview (target region, facility type, date, market validation)
+- Top site recommendation details (location, score, opportunity type, strengths, concerns)
+- Power & infrastructure metrics (available MW, power cost $/kWh, grid reliability, renewable mix)
+- Connectivity metrics (fiber carriers, IXP proximity, latency to major hubs)
+- Existing facility landscape (total facilities, capacity density MW/km2, hyperscaler presence %, avg facility tier)
+- TCO analysis (power cost tier, land cost, tax incentives, total cost index)
+- Risk assessment (natural disaster exposure, water stress, regulatory complexity)
+- Alternative sites (name, score, strength, concern, why not top choice)
+- Next steps (actionable items: utility applications, land acquisition, permitting, fiber procurement)
+- Key insights (power market dynamics, competitive clustering, regulatory landscape, sustainability positioning)
+- Methodology summary
+
+### Step 2: Call the Tool
+Call the generate_html_report tool with the formatted report data.
+The tool will:
+- Generate a professional 7-slide HTML report
+- Save it as an artifact named "executive_report.html"
+- Return the status and artifact details
+
+### Step 3: Report Result
+After the tool returns, confirm the report was generated successfully.
+If there was an error, report what went wrong.
+"""
+
 report_generator_agent = LlmAgent(
     name="ReportGeneratorAgent",
     model=FAST_MODEL,
     description="Generates professional McKinsey/BCG-style HTML executive reports using the generate_html_report tool",
-    instruction=REPORT_GENERATOR_INSTRUCTION,
+    instruction=REPORT_GENERATOR_INSTRUCTION_DATACENTER,
     generate_content_config=types.GenerateContentConfig(
         http_options=types.HttpOptions(
             retry_options=types.HttpRetryOptions(

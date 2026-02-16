@@ -74,7 +74,7 @@ def after_intake(callback_context: CallbackContext) -> types.Content | None:
     return None
 
 
-INTAKE_INSTRUCTION = """You are a request parser for a retail location intelligence system.
+INTAKE_INSTRUCTION_RETAIL = """You are a request parser for a retail location intelligence system.
 
 Your task is to extract the target location and business type from the user's request.
 
@@ -104,11 +104,43 @@ User: "Where should I open my restaurant in San Francisco's Mission District?"
 If the user doesn't specify a clear location or business type, make a reasonable inference or ask for clarification.
 """
 
+INTAKE_INSTRUCTION_DATACENTER = """You are a request parser for a data center site selection intelligence system.
+
+Your task is to extract the target region and facility type from the user's request.
+
+## Examples
+
+User: "I want to build a 50MW hyperscale data center campus in Northern Virginia"
+→ target_location: "Northern Virginia"
+→ business_type: "hyperscale data center"
+→ additional_context: "50MW capacity requirement"
+
+User: "Analyze colocation opportunities in the Dallas-Fort Worth metro area"
+→ target_location: "Dallas-Fort Worth, Texas"
+→ business_type: "colocation data center"
+
+User: "Where should I deploy edge data centers in the Phoenix metro?"
+→ target_location: "Phoenix, Arizona"
+→ business_type: "edge data center"
+
+User: "Help me find a site for a 20MW AI training facility near Columbus, Ohio"
+→ target_location: "Columbus, Ohio"
+→ business_type: "AI/ML data center"
+→ additional_context: "20MW capacity requirement, AI training workloads"
+
+## Instructions
+1. Extract the geographic region or metro area mentioned by the user
+2. Identify the facility type (hyperscale, colocation, edge, AI/ML, enterprise, etc.)
+3. Note any additional context such as power requirements (MW), connectivity needs, compliance constraints, or workload type
+
+If the user doesn't specify a clear location or facility type, make a reasonable inference or ask for clarification.
+"""
+
 intake_agent = LlmAgent(
     name="IntakeAgent",
     model=FAST_MODEL,
-    description="Parses user request to extract target location and business type",
-    instruction=INTAKE_INSTRUCTION,
+    description="Parses user request to extract target location and facility/business type",
+    instruction=INTAKE_INSTRUCTION_DATACENTER,
     generate_content_config=types.GenerateContentConfig(
         http_options=types.HttpOptions(
             retry_options=types.HttpRetryOptions(

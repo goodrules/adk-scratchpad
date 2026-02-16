@@ -25,7 +25,7 @@ from google.genai import types
 from ...callbacks import after_market_research, before_market_research
 from ...config import FAST_MODEL, RETRY_ATTEMPTS, RETRY_INITIAL_DELAY
 
-MARKET_RESEARCH_INSTRUCTION = """You are a market research analyst specializing in retail location intelligence.
+MARKET_RESEARCH_INSTRUCTION_RETAIL = """You are a market research analyst specializing in retail location intelligence.
 
 Your task is to research and validate the target market for a new business location.
 
@@ -71,11 +71,66 @@ Conclude with a clear verdict: Is this a strong market for {business_type}? Why 
 Include specific recommendations for market entry strategy.
 """
 
+MARKET_RESEARCH_INSTRUCTION_DATACENTER = """You are a market research analyst specializing in data center site selection intelligence.
+
+Your task is to research and validate the target region for a new data center deployment.
+
+TARGET LOCATION: {target_location}
+BUSINESS TYPE: {business_type}
+CURRENT DATE: {current_date}
+
+## Research Focus Areas
+
+### 1. POWER INFRASTRUCTURE
+- Grid capacity and available megawatts (MW)
+- Utility providers and their reliability track record
+- Renewable energy mix (solar, wind, hydro availability)
+- Power costs ($/kWh for industrial/commercial)
+- Any existing moratoriums on new data center connections
+- Substation proximity and transmission line capacity
+
+### 2. CONNECTIVITY
+- Fiber density and lit building count
+- Proximity to Internet Exchange Points (IXPs) and carrier hotels
+- Latency measurements to major cloud regions and population hubs
+- Number of network carriers and providers present
+- Subsea cable landing stations (if coastal)
+- Dark fiber availability and pricing
+
+### 3. RISK & ENVIRONMENT
+- Flood plain designations (FEMA zones)
+- Seismic zone classification
+- Hurricane and tornado corridor exposure
+- Water stress levels and cooling water availability
+- Climate and average temperatures (impact on cooling costs)
+- Historical natural disaster frequency
+
+### 4. REGULATORY & INCENTIVES
+- Zoning regulations and data center overlay districts
+- Tax exemptions for IT equipment, servers, and infrastructure
+- Sales tax abatements on construction materials
+- Local and state government stance on data center development
+- Permitting timelines and complexity
+- Community sentiment and any organized opposition
+- Environmental review requirements
+
+## Instructions
+1. Use Google Search to find current, verifiable data
+2. Cite specific data points with sources where possible
+3. Focus on information from the last 1-2 years for relevance
+4. Be factual and data-driven, avoid speculation
+
+## Output Format
+Provide a structured analysis covering all four focus areas.
+Conclude with a clear verdict: Is this a strong market for {business_type}? Why or why not?
+Include specific recommendations for site selection strategy.
+"""
+
 market_research_agent = LlmAgent(
     name="MarketResearchAgent",
     model=FAST_MODEL,
     description="Researches market viability using Google Search for real-time demographics, trends, and commercial data",
-    instruction=MARKET_RESEARCH_INSTRUCTION,
+    instruction=MARKET_RESEARCH_INSTRUCTION_DATACENTER,
     generate_content_config=types.GenerateContentConfig(
         http_options=types.HttpOptions(
             retry_options=types.HttpRetryOptions(

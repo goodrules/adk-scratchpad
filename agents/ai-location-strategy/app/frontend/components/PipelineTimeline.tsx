@@ -23,7 +23,7 @@ const TIMELINE_STEPS: TimelineStepConfig[] = [
   },
   {
     id: "competitor_mapping",
-    label: "Competitor Analysis",
+    label: "Facility Analysis",
     stageKey: "competitor_mapping",
     tool: { icon: "\uD83D\uDCCD", name: "search_places" },
   },

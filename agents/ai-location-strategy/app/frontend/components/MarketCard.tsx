@@ -17,19 +17,19 @@ export function MarketCard({ market }: MarketCardProps) {
 
       <div className="space-y-3">
         <MarketRow
-          label="Population Density"
+          label="Demand Density"
           value={market.population_density}
         />
         <MarketRow
-          label="Income Level"
+          label="Cost Profile"
           value={market.income_level}
         />
         <MarketRow
-          label="Rental Cost"
+          label="Operating Cost"
           value={market.rental_cost_tier}
         />
         <MarketRow
-          label="Foot Traffic"
+          label="Traffic & Demand"
           value={market.foot_traffic_pattern}
           isText
         />

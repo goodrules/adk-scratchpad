@@ -27,8 +27,8 @@ export function CompetitorCard({ competition }: CompetitorCardProps) {
     <div className="bg-white rounded-xl shadow-sm border p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-          <span className="text-xl">🏪</span>
-          Competition Profile
+          <span className="text-xl">🏢</span>
+          Landscape Profile
         </h3>
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${intensityColor}`}>
           {intensity} Competition
@@ -37,7 +37,7 @@ export function CompetitorCard({ competition }: CompetitorCardProps) {
 
       <div className="grid grid-cols-2 gap-4">
         <StatBlock
-          label="Total Competitors"
+          label="Total Facilities"
           value={competition.total_competitors.toString()}
           icon="📊"
         />
@@ -47,21 +47,21 @@ export function CompetitorCard({ competition }: CompetitorCardProps) {
           icon="📍"
         />
         <StatBlock
-          label="Chain Dominance"
+          label="Major Provider Share"
           value={`${competition.chain_dominance_pct.toFixed(0)}%`}
           icon="🏢"
           highlight={competition.chain_dominance_pct > 50}
         />
         <StatBlock
-          label="Avg Rating"
+          label="Avg Quality Rating"
           value={`⭐ ${competition.avg_competitor_rating.toFixed(1)}`}
           icon=""
         />
         <StatBlock
-          label="High Performers"
+          label="Top Tier"
           value={competition.high_performers_count.toString()}
           icon="🏆"
-          subtitle="4.5+ rating"
+          subtitle="4.5+ quality"
           highlight={competition.high_performers_count > 5}
         />
         <StatBlock
