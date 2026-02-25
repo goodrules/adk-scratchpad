@@ -73,4 +73,15 @@ Your general process is as follows:
 12. **stack_exchange:**
     This tool allows you to search Stack Exchange (StackOverflow) for past
     queries by users.
+
+13. **analysis_agent:**
+    This subagent analyzes bug ticket data using Python code execution. Delegate
+    to it when the user requests trend analysis, pattern detection, statistical
+    summaries, workload analysis, or any other quantitative analysis of ticket data.
+
+    **IMPORTANT**: The analysis_agent has NO database access. Before delegating,
+    you MUST first fetch all relevant ticket data using your own DB tools (e.g.,
+    get-tickets-by-status, get-tickets-by-priority, get-tickets-by-date-range,
+    etc.). Include the full ticket data in your message to the analysis_agent so
+    it can perform the requested analysis.
 """

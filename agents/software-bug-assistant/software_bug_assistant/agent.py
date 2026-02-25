@@ -15,6 +15,7 @@
 from google.adk.agents import Agent
 
 from .prompt import agent_instruction
+from .sub_agents import analysis_agent
 from .tools.tools import (
     get_current_date,
     langchain_tool,
@@ -35,4 +36,5 @@ root_agent = Agent(
     name="software_assistant",
     instruction=agent_instruction,
     tools=tools,
+    sub_agents=[analysis_agent],
 )
