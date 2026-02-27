@@ -5,11 +5,15 @@
 
 ## Overview
 
-The Software Bug Assistant is a sample agent designed to help IT Support and Software Developers triage, manage, and resolve software issues. This sample agent uses ADK Python, a PostgreSQL bug ticket database (internal tickets), GitHub MCP server (external tickets), RAG, Google Search, and StackOverflow to assist in debugging. 
+The Software Bug Assistant is a sample agent designed to help IT Support and Software Developers triage, manage, and resolve software issues. This sample agent uses ADK Python, a PostgreSQL bug ticket database (internal tickets), GitHub MCP server (external tickets), RAG, Google Search, and StackOverflow to assist in debugging.
+
+The agent runs in two modes:
+- **Local development**: `adk web` / `adk run` — uses ADK's built-in web UI for interactive development.
+- **Deployed (Cloud Run)**: `uv run .` — launches an [A2A (Agent-to-Agent)](https://google.github.io/A2A/) server, allowing other A2A-compliant agents and clients to discover and call this agent programmatically.
 
 ![](deployment/images/google-cloud-architecture.png)
 
-This README contains instructions for local and Google Cloud deployment. 
+This README contains instructions for local and Google Cloud deployment.
 
 ## Agent Details
 
@@ -17,11 +21,12 @@ The key features of the Software Bug Assistant Agent include:
 
 | Feature | Description |
 | --- | --- |
-| **Interaction Type** | Conversational |
+| **Interaction Type** | Conversational (A2A when deployed) |
 | **Complexity**       | Intermediate |
-| **Agent Type**       | Single Agent |
+| **Agent Type**       | Multi-Agent (root + analysis sub-agent) |
 | **Components**       | Tools, Database, RAG, Google Search, GitHub MCP |
 | **Vertical**         | Horizontal / IT Support |
+| **Deployment**       | Cloud Run (A2A server) |
 
 ## Agent Architecture
 
@@ -29,14 +34,15 @@ The key features of the Software Bug Assistant Agent include:
 
 ## Key Features
 
-*   **Retrieval-Augmented Generation (RAG):** Leverages Cloud SQL's built-in [Vertex AI ML Integration](https://cloud.google.com/sql/docs/postgres/integrate-cloud-sql-with-vertex-ai) to fetch relevant/duplicate software bugs.
+*   **Retrieval-Augmented Generation (RAG):** Leverages Cloud SQL’s built-in [Vertex AI ML Integration](https://cloud.google.com/sql/docs/postgres/integrate-cloud-sql-with-vertex-ai) to fetch relevant/duplicate software bugs.
 *   **MCP Toolbox for Databases:** [MCP Toolbox for Databases](https://github.com/googleapis/genai-toolbox) to provide database-specific tools to our agent.
-*   **GitHub MCP Server:** Connects to [GitHub's remote MCP server](https://github.com/github/github-mcp-server?tab=readme-ov-file#remote-github-mcp-server)
+*   **GitHub MCP Server:** Connects to [GitHub’s remote MCP server](https://github.com/github/github-mcp-server?tab=readme-ov-file#remote-github-mcp-server)
 to fetch external software bugs (open issues, pull requests, etc).
 *   **Google Search:** Leverages Google Search as a built-in tool to fetch
-relevant search results in order to ground the agent's responses with external
+relevant search results in order to ground the agent’s responses with external
 up-to-date knowledge.
 *   **StackOverflow:** Query [StackOverflow’s](https://stackoverflow.com/) powerful Q\&A data, using [LangChain’s extensive tools library](https://python.langchain.com/docs/integrations/tools/)— specifically, the [StackExchange API Wrapper tool.](https://python.langchain.com/docs/integrations/tools/stackexchange/). ADK comes with support for [third-party tools like LangChain tools](https://google.github.io/adk-docs/tools/third-party-tools/#1-using-langchain-tools)
+*   **A2A Protocol Support:** When deployed to Cloud Run, the agent exposes an [A2A](https://google.github.io/A2A/) HTTP endpoint. Other A2A-compliant agents and clients can discover and call this agent via its `/.well-known/agent.json` agent card.
 
 ## Setup and Installation
 
@@ -282,11 +288,11 @@ You should see a JSON response with the list of tools specified in `tools.yaml`.
 }
 ```
 
-### 4 - Running the Agent Locally 
+### 4 - Running the Agent Locally
 
-Now we're ready to run the ADK Python agent! 
+Now we're ready to run the ADK Python agent!
 
-By default, the agent is configured to talk to the local MCP Toolbox server at `http://127.0.0.1:5000`, so **keep the Toolbox server running**. 
+By default, the agent is configured to talk to the local MCP Toolbox server at `http://127.0.0.1:5000`, so **keep the Toolbox server running**.
 
 You can run the agent using the `adk` command in a **new** terminal.
 
@@ -302,8 +308,11 @@ You can run the agent using the `adk` command in a **new** terminal.
     uv run adk web
     ```
 
-The command `adk` web will start a web server on your machine and print
-the URL. You may open the URL, select "software_bug_assistant" in the top-left drop-down menu, and a chatbot interface will appear on the right. The conversation is initially blank. 
+The command `adk web` will start a web server on your machine and print
+the URL. You may open the URL, select "software_bug_assistant" in the top-left drop-down menu, and a chatbot interface will appear on the right. The conversation is initially blank.
+
+> [!NOTE]
+> Local mode uses ADK's built-in web UI for interactive development. When deployed to Cloud Run, the agent instead exposes an A2A HTTP endpoint (not the ADK web UI) — see the [Deploy to Google Cloud](#%EF%B8%8F-deploy-to-google-cloud) section below.
 
 Here are some example requests you may ask the agent:
 
@@ -563,57 +572,104 @@ gcloud artifacts repositories create adk-samples \
   --project=$PROJECT_ID
 ```
 
-### 11 - Containerize the ADK Python agent. 
+### 11 - Containerize the ADK Python agent.
 
-Build the container image and push it to Artifact Registry with Cloud Build.
+Build the container image and push it to Artifact Registry with Cloud Build. The Dockerfile uses `uv run .` as its entry point, which executes `__main__.py` and launches the A2A server.
 
 ```bash
 gcloud builds submit --region=us-central1 --tag us-central1-docker.pkg.dev/$PROJECT_ID/adk-samples/software-bug-assistant:latest
 ```
 
-### 12 - Deploy the agent to Cloud Run 
+### 12 - Deploy the agent to Cloud Run
 
+The deployed service is an **A2A server** (not the ADK web UI). It exposes an HTTP endpoint that A2A-compliant agents and clients can use to discover and call the agent.
 
-> [!NOTE]    
-> 
-> If you are using Vertex AI instead of AI Studio for Gemini calls, you will need to replace `GOOGLE_API_KEY` with `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`, and `GOOGLE_GENAI_USE_VERTEXAI=TRUE` in the last line of the below `gcloud run deploy` command.
-> 
+> [!NOTE]
+> `APP_URL` should be set to the Cloud Run service URL so the agent card advertises the correct public endpoint. You can get it after the first deploy with `gcloud run services describe software-bug-assistant --region us-central1 --format "value(status.url)"` and redeploy if needed.
+
+> [!NOTE]
+> If you are using Vertex AI instead of AI Studio for Gemini calls, replace `GOOGLE_API_KEY` with `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`, and `GOOGLE_GENAI_USE_VERTEXAI=TRUE`:
+>
 > ```bash
-> --set-env-vars=GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=us-central1,GOOGLE_GENAI_USE_VERTEXAI=TRUE,MCP_TOOLBOX_URL=$MCP_TOOLBOX_URL,GITHUB_PERSONAL_ACCESS_TOKEN=$GITHUB_PERSONAL_ACCESS_TOKEN
+> --set-env-vars=GOOGLE_CLOUD_PROJECT=$PROJECT_ID,GOOGLE_CLOUD_LOCATION=us-central1,GOOGLE_GENAI_USE_VERTEXAI=TRUE,MCP_TOOLBOX_URL=$MCP_TOOLBOX_URL,GITHUB_PERSONAL_ACCESS_TOKEN=$GITHUB_PERSONAL_ACCESS_TOKEN,APP_URL=$APP_URL
 > ```
 
 ```bash
+export APP_URL="https://software-bug-assistant-<hash>-uc.a.run.app"  # replace with your Cloud Run URL
+
 gcloud run deploy software-bug-assistant \
   --image=us-central1-docker.pkg.dev/$PROJECT_ID/adk-samples/software-bug-assistant:latest \
   --region=us-central1 \
   --allow-unauthenticated \
-  --set-env-vars=GOOGLE_API_KEY=$GOOGLE_API_KEY,MCP_TOOLBOX_URL=$MCP_TOOLBOX_URL,GITHUB_PERSONAL_ACCESS_TOKEN=$GITHUB_PERSONAL_ACCESS_TOKEN 
+  --set-env-vars=GOOGLE_API_KEY=$GOOGLE_API_KEY,MCP_TOOLBOX_URL=$MCP_TOOLBOX_URL,GITHUB_PERSONAL_ACCESS_TOKEN=$GITHUB_PERSONAL_ACCESS_TOKEN,APP_URL=$APP_URL
 ```
 
-When this runs successfully, you should see: 
+> [!WARNING]
+> `--allow-unauthenticated` makes the A2A endpoint publicly accessible. This is fine for demos, but for production use consider adding authentication.
+
+When this runs successfully, you should see:
 
 ```bash
 Service [software-bug-assistant] revision [software-bug-assistant-00001-d4s] has been deployed and is serving 100 percent of traffic.
 ```
 
+### 13 - Test the A2A Endpoint
 
-### 13 - Test the Cloud Run Agent
+The deployed Cloud Run service exposes an A2A endpoint. You can test it with `curl`:
 
-Open the Cloud Run Service URL outputted by the previous step. 
+**Fetch the agent card** (discovery endpoint):
 
-You should see the ADK Web UI for the Software Bug Assistant. 
+```bash
+export SERVICE_URL=$(gcloud run services describe software-bug-assistant --region us-central1 --format "value(status.url)")
 
-Test the agent by asking questions like: 
-- `Any issues around database timeouts?` 
-- `How many bugs are assigned to samuel.green@example.com? Show a table.` 
-- `What are some possible root-causes for the unresponsive login page issue?` (Invoke Google Search tool)
-- `Get the bug ID for the unresponsive login page issues` --> `Boost that bug's priority to P0.`. 
-- `Create a new bug.` (let the agent guide you through bug creation)
+curl $SERVICE_URL/.well-known/agent.json
+```
 
-*Example workflow*: 
+You should see the agent card JSON describing the agent's name, skills, and capabilities.
 
-![](deployment/images/cloud-run-example.png)
+**Send a task to the agent**:
 
+```bash
+curl -X POST $SERVICE_URL/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": "1",
+    "method": "tasks/send",
+    "params": {
+      "message": {
+        "role": "user",
+        "parts": [{"text": "List all open internal tickets."}]
+      }
+    }
+  }'
+```
+
+Example tasks to try:
+- `"List all open internal tickets."`
+- `"Are there any discussions on StackOverflow about CVE-2024-3094?"`
+- `"What are the latest 5 open issues on the psf/requests GitHub repository?"`
+
+
+## Architecture: Local vs Deployed
+
+The agent runs differently depending on the environment:
+
+| | Local | Cloud Run |
+|---|---|---|
+| **Entry point** | `adk web` / `adk run` | `uv run .` → `__main__.py` |
+| **Interface** | ADK built-in web UI | A2A HTTP server (port 8080) |
+| **Agent discovery** | ADK CLI scans the `software_bug_assistant` package for `root_agent` | `/.well-known/agent.json` agent card endpoint |
+| **Interoperability** | Interactive human use | A2A-compliant agents and clients |
+
+**Local flow**: `adk web` imports the `software_bug_assistant` package, discovers `root_agent`, and serves the ADK web UI.
+
+**Deployed flow**: `uv run .` executes `__main__.py`, which:
+1. Builds an `AgentCard` describing the agent's name, skills, and capabilities.
+2. Wraps `root_agent` in an `A2aAgentExecutor` (backed by an ADK `Runner` with in-memory services).
+3. Serves an A2A-compliant HTTP endpoint on port 8080 via Starlette + uvicorn.
+
+Other A2A-compliant agents and clients can discover this agent via `GET /.well-known/agent.json` and send tasks via `POST /`.
 
 ## Alternative: Using Agent Starter Pack
 

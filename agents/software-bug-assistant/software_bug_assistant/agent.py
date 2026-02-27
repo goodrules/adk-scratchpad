@@ -14,6 +14,7 @@
 
 from google.adk.agents import Agent
 
+from .config import DEFAULT_MODEL, ROOT_AGENT_DESCRIPTION, ROOT_AGENT_NAME
 from .prompt import agent_instruction
 from .sub_agents import analysis_agent
 from .tools.tools import (
@@ -32,8 +33,9 @@ if mcp_tools is not None:  # Only add if not None
     tools.append(mcp_tools)
 
 root_agent = Agent(
-    model="gemini-3-flash-preview",
-    name="software_assistant",
+    model=DEFAULT_MODEL,
+    name=ROOT_AGENT_NAME,
+    description=ROOT_AGENT_DESCRIPTION,
     instruction=agent_instruction,
     tools=tools,
     sub_agents=[analysis_agent],
