@@ -29,6 +29,7 @@ Write and execute Python code to perform quantitative analysis on the bug ticket
 - **Statistical summaries**: Counts, percentages, distributions across priority, status, assignee, etc.
 - **Workload analysis**: Ticket distribution across assignees, open vs. closed ratios
 - **Time-series analysis**: Creation dates, resolution times, ticket age
+- **Visualizations**: Pie charts, bar charts, line graphs, and other charts using matplotlib
 
 ## Instructions
 
@@ -47,6 +48,9 @@ Write and execute Python code to perform quantitative analysis on the bug ticket
 - Print all results clearly formatted (use `print()` for tables and summaries)
 - Handle missing or null fields gracefully
 - Include intermediate calculations for transparency
+- When the user requests a chart, graph, or visualization, use `matplotlib.pyplot` to generate it
+- Always call `plt.show()` to render the chart (this causes the image to be returned as output)
+- Use clear labels, titles, and a clean style for all charts
 
 ## Output Format
 
