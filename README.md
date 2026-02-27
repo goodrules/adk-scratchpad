@@ -19,14 +19,23 @@ Contains a step-by-step tutorial and reference implementations for learning ADK.
   - Orchestrating multi-agent workflows (Sequential, Parallel, Loop)
 - **Sample Agents**:
   - `my_first_agent/`: Basic "Hello World" agent.
+  - `my_2_agent/`: Basic agent example.
   - `workflow_agent_seq/`: Example of a sequential workflow.
   - `mcp_test_agent/`: Example using the Model Context Protocol (filesystem access).
 
 ### 2. `agents/`
 Contains standalone, functional agents demonstrating specific capabilities.
-- **`google_search_agent/`**: A simple agent equipped with the `GoogleSearchTool` for grounded responses.
-- **`rag_agent/`**: A sophisticated RAG (Retrieval-Augmented Generation) implementation using Vertex AI.
-- **`short_story_agent/`**: A creative writing agent demonstrating complex orchestration (planning, writing, editing).
+- **`google_search_agent/`**: Simple agent with `GoogleSearchTool` for grounded responses.
+- **`bq_agent/`**: Analyzes Hacker News data using BigQuery with sub-agents.
+- **`rag_agent/`**: RAG implementation using Vertex AI RAG Engine with retrieval, evaluation, and search fallback.
+- **`short_story_agent/`**: Creative writing agent with sequential planning, writing, and iterative editing.
+- **`short-movie-agents/`**: Multi-agent pipeline for end-to-end video creation using Imagen4 and Veo3.
+- **`software-bug-assistant/`**: Bug triage agent using PostgreSQL, GitHub MCP, Google Search, and StackOverflow.
+- **`travel-concierge/`**: Multi-agent travel concierge with 6 specialized sub-agents for trip planning and support.
+- **`ai-location-strategy/`**: 7-stage pipeline for retail site selection with Maps API, code execution, and report generation.
+- **`bidi-demo-WIP/`**: Bidirectional streaming demo with Gemini Live API (work in progress).
+
+> **Note:** Some agents (e.g., `ai-location-strategy`, `short-movie-agents`) have their own `pyproject.toml` and `Makefile` with additional setup. Check each agent's README for details.
 
 ---
 
@@ -56,11 +65,11 @@ pip install -r requirements.txt
    ```
 
 2. **Configure Environment Variables:**
-   Copy the `.env.example` (if available) or create a `.env` file in the root directory:
-   ```bash
-   export GOOGLE_CLOUD_PROJECT="your-project-id"
-   export GOOGLE_CLOUD_LOCATION="us-central1"
-   export GOOGLE_GENAI_USE_VERTEXAI=true
+   Copy `agents/.env.example` to `agents/.env` and fill in your project details:
+   ```
+   GOOGLE_GENAI_USE_VERTEXAI=TRUE
+   GOOGLE_CLOUD_PROJECT=<your-project-id>
+   GOOGLE_CLOUD_LOCATION=global
    ```
 
 ---
@@ -78,6 +87,21 @@ adk run google_search_agent
 Or use the web interface:
 ```bash
 adk web
+```
+
+Some complex agents have their own Makefile for running and development:
+```bash
+cd agents/ai-location-strategy
+make install   # Install dependencies with uv
+make dev       # Run ADK web UI locally
+```
+
+---
+
+## 🧪 Testing
+
+```bash
+pytest tests/
 ```
 
 ---
