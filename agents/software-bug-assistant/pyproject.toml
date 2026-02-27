@@ -5,7 +5,7 @@ description = "Software bug assistant using ADK"
 authors = [{ name = "Jack Wotherspoon", email = "jackwoth@google.com" }]
 license = {text = "Apache License 2.0"}
 readme = "README.md"
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10,<3.14"
 
 dependencies = [
     "google-adk>=1.8.0",
@@ -15,6 +15,10 @@ dependencies = [
     "python-dotenv>=1.1.0",
     "stackapi>=0.3.1",
     "toolbox-core>=0.1.0",
+    "a2a-sdk>=0.3.0",
+    "starlette>=0.46.1",
+    "uvicorn>=0.34.0",
+    "click>=8.1.8",
 ]
 
 [dependency-groups]

@@ -18,6 +18,16 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 from google.adk.agents import Agent
+
+from ..config import (
+    DATE_FORMAT,
+    GITHUB_MCP_TOOL_FILTER,
+    GITHUB_MCP_URL,
+    SEARCH_AGENT_MODEL,
+    SEARCH_AGENT_NAME,
+    TOOLBOX_TOOLSET_NAME,
+    resolve_toolbox_url,
+)
 from google.adk.tools import google_search
 from google.adk.tools.agent_tool import AgentTool
 from google.adk.tools.langchain_tool import LangchainTool
@@ -35,13 +45,13 @@ def get_current_date() -> dict:
     """
     Get the current date in the format YYYY-MM-DD
     """
-    return {"current_date": datetime.now().strftime("%Y-%m-%d")}
+    return {"current_date": datetime.now().strftime(DATE_FORMAT)}
 
 
 # ----- Example of a Built-in Tool -----
 search_agent = Agent(
-    model="gemini-3-flash-preview",
-    name="search_agent",
+    model=SEARCH_AGENT_MODEL,
+    name=SEARCH_AGENT_NAME,
     instruction="""
     You're a specialist in Google Search.
     """,
@@ -56,13 +66,13 @@ stack_exchange_tool = StackExchangeTool(api_wrapper=StackExchangeAPIWrapper())
 langchain_tool = LangchainTool(stack_exchange_tool)
 
 # ----- Example of a Google Cloud Tool (MCP Toolbox for Databases) -----
-TOOLBOX_URL = os.getenv("MCP_TOOLBOX_URL", "http://127.0.0.1:5000")
+TOOLBOX_URL = resolve_toolbox_url()
 
 # Initialize Toolbox client and load tools
 # If the toolbox server is not available (e.g., in CI), set to empty list
 try:
     toolbox = ToolboxSyncClient(TOOLBOX_URL)
-    toolbox_tools = toolbox.load_toolset("tickets_toolset")
+    toolbox_tools = toolbox.load_toolset(TOOLBOX_TOOLSET_NAME)
 except Exception:
     # Toolbox server not available, set to empty list
     toolbox_tools = []
@@ -73,20 +83,13 @@ except Exception:
 try:
     mcp_tools = MCPToolset(
         connection_params=StreamableHTTPConnectionParams(
-            url="https://api.githubcopilot.com/mcp/",
+            url=GITHUB_MCP_URL,
             headers={
                 "Authorization": "Bearer " + os.getenv("GITHUB_PERSONAL_ACCESS_TOKEN"),
             },
         ),
         # Read only tools
-        tool_filter=[
-            "search_repositories",
-            "search_issues",
-            "list_issues",
-            "get_issue",
-            "list_pull_requests",
-            "get_pull_request",
-        ],
+        tool_filter=GITHUB_MCP_TOOL_FILTER,
     )
 except Exception:
     # GitHub MCP server not available or token missing

@@ -15,12 +15,13 @@
 from google.adk.agents import LlmAgent
 from google.adk.code_executors import BuiltInCodeExecutor
 
+from ...config import ANALYSIS_AGENT_DESCRIPTION, ANALYSIS_AGENT_MODEL, ANALYSIS_AGENT_NAME
 from .prompt import ANALYSIS_INSTRUCTION
 
 analysis_agent = LlmAgent(
-    name="analysis_agent",
-    model="gemini-3-flash-preview",
-    description="Analyzes bug ticket data using Python code execution. Delegate when the user requests trend analysis, pattern detection, statistical summaries, or any quantitative analysis of ticket data.",
+    name=ANALYSIS_AGENT_NAME,
+    model=ANALYSIS_AGENT_MODEL,
+    description=ANALYSIS_AGENT_DESCRIPTION,
     instruction=ANALYSIS_INSTRUCTION,
     code_executor=BuiltInCodeExecutor(),
 )

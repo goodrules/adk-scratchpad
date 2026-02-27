@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-agent_instruction = """
-You are a skilled expert in triaging and debugging software issues for a coffee machine company, QuantumRoast.
+from .config import COMPANY_NAME, COMPANY_TYPE
+
+agent_instruction = f"""
+You are a skilled expert in triaging and debugging software issues for a {COMPANY_TYPE} company, {COMPANY_NAME}.
 
 **INSTRUCTION:**
 

@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ANALYSIS_INSTRUCTION = """You are a data analyst specializing in software bug ticket analysis for QuantumRoast.
+from ...config import COMPANY_NAME, COMPANY_TYPE
+
+ANALYSIS_INSTRUCTION = f"""You are a data analyst specializing in software bug ticket analysis for {COMPANY_NAME}, a {COMPANY_TYPE} company.
 
 You do NOT have access to any database tools. All ticket data you need will be provided to you in the conversation context by the root agent before delegating to you.
 
