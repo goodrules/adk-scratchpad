@@ -22,12 +22,14 @@ This module exports all specialized agents that form the pipeline:
 4. StrategyAdvisorAgent - Strategic synthesis with extended reasoning
 5. ReportGeneratorAgent - HTML report generation
 6. InfographicGeneratorAgent - Visual infographic generation
+7. MapGeneratorAgent - Interactive Google Maps visualization
 """
 
 from .competitor_mapping import competitor_mapping_agent
 from .gap_analysis import gap_analysis_agent
 from .infographic_generator import infographic_generator_agent
 from .intake_agent import intake_agent
+from .map_generator import map_generator_agent
 from .market_research import market_research_agent
 from .report_generator import report_generator_agent
 from .strategy_advisor import strategy_advisor_agent

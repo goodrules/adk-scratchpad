@@ -118,12 +118,12 @@ export function LocationReport({ report }: ReportDisplayProps) {
           <InfoCard
             icon="👥"
             label="Target Segment"
-            value={rec.best_customer_segment}
+            value={rec.target_customer_segment}
           />
           <InfoCard
             icon="📊"
             label="Demand Estimate"
-            value={rec.estimated_foot_traffic}
+            value={rec.estimated_demand_level}
           />
         </div>
 

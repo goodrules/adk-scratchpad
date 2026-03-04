@@ -157,6 +157,42 @@ export function StepOutputContent({ stepId, state }: StepOutputContentProps) {
         </div>
       );
 
+    case "map_generation":
+      if (!state.map_html_content) {
+        return <p className="text-gray-500 text-sm italic">Generating interactive map...</p>;
+      }
+      return (
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-green-700">Interactive map generated</span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                const blob = new Blob([state.map_html_content!], { type: "text/html" });
+                const url = URL.createObjectURL(blob);
+                window.open(url, "_blank");
+              }}
+              className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              View Map
+            </button>
+            <button
+              onClick={() => {
+                const blob = new Blob([state.map_html_content!], { type: "text/html" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "interactive_map.html";
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="px-3 py-1 text-xs bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+            >
+              Download HTML
+            </button>
+          </div>
+        </div>
+      );
+
     default:
       return null;
   }

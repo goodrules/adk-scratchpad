@@ -51,6 +51,12 @@ const TIMELINE_STEPS: TimelineStepConfig[] = [
     stageKey: "infographic_generation",
     tool: { icon: "\uD83C\uDFA8", name: "image_gen" },
   },
+  {
+    id: "map_generation",
+    label: "Interactive Map",
+    stageKey: "map_generation",
+    tool: { icon: "\uD83D\uDDFA\uFE0F", name: "google_maps" },
+  },
 ];
 
 interface PipelineTimelineProps {
