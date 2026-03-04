@@ -102,11 +102,11 @@ class LocationRecommendation(BaseModel):
     market: MarketCharacteristics = Field(
         description="Market characteristics for this location"
     )
-    best_customer_segment: str = Field(
-        description="Best customer segment to target"
+    target_customer_segment: str = Field(
+        description="Target customer segment"
     )
-    estimated_foot_traffic: str = Field(
-        description="Estimated foot traffic description"
+    estimated_demand_level: str = Field(
+        description="Estimated demand level description"
     )
     next_steps: list[str] = Field(description="Actionable next steps")
 

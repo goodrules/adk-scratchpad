@@ -91,17 +91,19 @@ Create an infographic that a business executive would use in a board presentatio
 """
 
         # Retry wrapper for handling model overload errors
+        num_attempts = 10
+
         @retry(
-            stop=stop_after_attempt(3),
+            stop=stop_after_attempt(num_attempts),
             wait=wait_exponential(multiplier=2, min=2, max=30),
             retry=retry_if_exception_type(ServerError),
             before_sleep=lambda retry_state: logger.warning(
                 f"Gemini API error, retrying in {retry_state.next_action.sleep} seconds... "
-                f"(attempt {retry_state.attempt_number}/3)"
+                f"(attempt {retry_state.attempt_number}/{num_attempts})"
             ),
         )
-        def generate_with_retry():
-            return client.models.generate_content(
+        async def generate_with_retry():
+            return await client.aio.models.generate_content(
                 model=IMAGE_MODEL,
                 contents=prompt,
                 config=types.GenerateContentConfig(
@@ -113,7 +115,7 @@ Create an infographic that a business executive would use in a board presentatio
             )
 
         # Generate the image using Gemini 3 Pro Image model
-        response = generate_with_retry()
+        response = await generate_with_retry()
 
         # Check for successful generation
         if response.candidates and len(response.candidates) > 0:

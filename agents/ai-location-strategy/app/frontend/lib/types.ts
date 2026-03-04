@@ -66,8 +66,8 @@ export interface LocationRecommendation {
   concerns: ConcernAnalysis[];
   competition: CompetitionProfile;
   market: MarketCharacteristics;
-  best_customer_segment: string;
-  estimated_foot_traffic: string;
+  target_customer_segment: string;
+  estimated_demand_level: string;
   next_steps: string[];
 }
 
@@ -116,7 +116,8 @@ export type PipelineStage =
   | "gap_analysis"
   | "strategy_synthesis"
   | "report_generation"
-  | "infographic_generation";
+  | "infographic_generation"
+  | "map_generation";
 
 /**
  * Complete agent state type for useCoAgent hook.
@@ -148,6 +149,7 @@ export interface AgentState {
   // Artifact content (set by tools for AG-UI frontend display)
   html_report_content?: string;
   infographic_base64?: string;
+  map_html_content?: string;
 
   // Metadata
   current_date?: string;

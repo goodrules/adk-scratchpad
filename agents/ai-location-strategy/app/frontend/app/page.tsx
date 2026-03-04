@@ -77,6 +77,7 @@ export default function Home() {
         strategy_synthesis: "Synthesizing strategy...",
         report_generation: "Generating executive report...",
         infographic_generation: "Creating infographic...",
+        map_generation: "Generating interactive map...",
       };
 
       const currentLabel = stageLabels[state.pipeline_stage] || `Processing ${state.pipeline_stage}...`;
@@ -90,7 +91,7 @@ export default function Home() {
               <span className="text-gray-700 text-sm">{currentLabel}</span>
             </div>
             <span className="text-xs text-gray-500">
-              {completedCount}/7 complete
+              {completedCount}/8 complete
             </span>
           </div>
         </div>
@@ -183,11 +184,12 @@ export default function Home() {
                 </ul>
               </div>
 
-              {/* Artifact Viewer - HTML Report and Infographic (full-screen view) */}
-              {(state.html_report_content || state.infographic_base64) && (
+              {/* Artifact Viewer - HTML Report, Infographic, and Interactive Map */}
+              {(state.html_report_content || state.infographic_base64 || state.map_html_content) && (
                 <ArtifactViewer
                   htmlReport={state.html_report_content}
                   infographic={state.infographic_base64}
+                  mapHtml={state.map_html_content}
                 />
               )}
             </div>

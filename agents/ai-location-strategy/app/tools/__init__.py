@@ -16,4 +16,5 @@
 
 from .html_report_generator import generate_html_report
 from .image_generator import generate_infographic
+from .map_generator import generate_interactive_map
 from .places_search import search_places

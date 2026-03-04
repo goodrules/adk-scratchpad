@@ -164,6 +164,22 @@ def before_infographic_generator(
     return None
 
 
+def before_map_generator(
+    callback_context: CallbackContext,
+) -> types.Content | None:
+    """Log start of map generation phase."""
+    logger.info("=" * 60)
+    logger.info("STAGE 6: MAP GENERATION - Starting")
+    logger.info("  Geocoding locations and building interactive Google Map...")
+    logger.info("=" * 60)
+
+    # Set current date for state injection in agent instruction
+    callback_context.state["current_date"] = datetime.now().strftime("%Y-%m-%d")
+    callback_context.state["pipeline_stage"] = "map_generation"
+
+    return None
+
+
 # ============================================================================
 # AFTER AGENT CALLBACKS
 # ============================================================================
@@ -383,11 +399,25 @@ def after_infographic_generator(
     stages.append("infographic_generation")
     callback_context.state["stages_completed"] = stages
 
+    return None
+
+
+def after_map_generator(
+    callback_context: CallbackContext,
+) -> types.Content | None:
+    """Log completion of map generation."""
+    logger.info("STAGE 6: COMPLETE - Interactive map generation finished")
+    logger.info("  (Artifact saved directly by generate_interactive_map tool)")
+
+    stages = callback_context.state.get("stages_completed", [])
+    stages.append("map_generation")
+    callback_context.state["stages_completed"] = stages
+
     # Log final pipeline summary
     logger.info("=" * 60)
     logger.info("PIPELINE COMPLETE")
     logger.info(f"  Stages completed: {stages}")
-    logger.info(f"  Total stages: {len(stages)}/7")
+    logger.info(f"  Total stages: {len(stages)}/8")
     logger.info("=" * 60)
 
     return None
