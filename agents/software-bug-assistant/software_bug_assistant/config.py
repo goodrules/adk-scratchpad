@@ -69,5 +69,5 @@ GITHUB_MCP_TOOL_FILTER = [
 
 # --- Misc ---
 DATE_FORMAT = "%Y-%m-%d"
-COMPANY_NAME = "Delta Airlines"
+COMPANY_NAME = "Airline Inc"
 COMPANY_TYPE = "airline"
