@@ -17,6 +17,13 @@ import os
 import sys
 from pathlib import Path
 
+from rich import box
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+
+console = Console()
+
 import googlemaps
 import pandas as pd
 import requests
@@ -221,17 +228,24 @@ def check_eval_results(result) -> bool:
     for metric, threshold in THRESHOLDS.items():
         actual = summary.get(metric)
         if actual is None:
-            failures.append(f"  {metric}: MISSING (expected >= {threshold})")
+            failures.append(f"{metric}: MISSING (expected >= {threshold})")
         elif actual < threshold:
-            failures.append(f"  {metric}: {actual} < {threshold}")
+            failures.append(f"{metric}: {actual} < {threshold}")
 
     if failures:
-        print("\nThreshold check FAILED:")
-        for f in failures:
-            print(f)
+        failure_text = "\n".join(failures)
+        console.print(Panel(
+            f"[bold red]THRESHOLD CHECK FAILED[/bold red]\n\n{failure_text}",
+            border_style="red",
+            title="Result",
+        ))
         return False
     else:
-        print("\nAll metrics passed.")
+        console.print(Panel(
+            "[bold green]ALL METRICS PASSED[/bold green]",
+            border_style="green",
+            title="Result",
+        ))
         return True
 
 
@@ -291,59 +305,68 @@ def agent_runnable(prompt: str) -> dict:
 def build_eval_dataset() -> pd.DataFrame:
     """Build eval dataset with prompts and reference trajectories across all tools."""
     data = [
-        # google_search_agent only (2)
+        # --- Single-tool: google_search_agent (Prompts 1–2) ---
+        # Prompt 1: America's Cup winner search
         {
             "prompt": "Who won the America's Cup sailing race most recently?",
             "reference_trajectory": json.dumps(
                 [{"tool_name": "google_search_agent", "tool_input": {"request": "Who won the America's Cup sailing race most recently?"}}]
             ),
         },
+        # Prompt 2: Panama Canal shipping routes search
         {
             "prompt": "What are the major shipping routes through the Panama Canal?",
             "reference_trajectory": json.dumps(
                 [{"tool_name": "google_search_agent", "tool_input": {"request": "major shipping routes through the Panama Canal"}}]
             ),
         },
-        # get_weather only (2)
+        # --- Single-tool: get_weather (Prompts 3–4) ---
+        # Prompt 3: Weather at Miami coordinates
         {
             "prompt": "What is the current weather at latitude 25.76, longitude -80.19?",
             "reference_trajectory": json.dumps(
                 [{"tool_name": "get_weather", "tool_input": {"latitude": 25.76, "longitude": -80.19}}]
             ),
         },
+        # Prompt 4: Weather near Strait of Gibraltar
         {
             "prompt": "Check the weather conditions at latitude 36.14, longitude -5.35 near the Strait of Gibraltar.",
             "reference_trajectory": json.dumps(
                 [{"tool_name": "get_weather", "tool_input": {"latitude": 36.14, "longitude": -5.35}}]
             ),
         },
-        # lookup_port only (2)
+        # --- Single-tool: lookup_port (Prompts 5–6) ---
+        # Prompt 5: Miami cruise port lookup
         {
             "prompt": "Find information about the cruise port in Miami.",
             "reference_trajectory": json.dumps(
                 [{"tool_name": "lookup_port", "tool_input": {"query": "cruise port in Miami"}}]
             ),
         },
+        # Prompt 6: Southampton cruise terminal lookup
         {
             "prompt": "Look up the cruise terminal in Southampton, England.",
             "reference_trajectory": json.dumps(
                 [{"tool_name": "lookup_port", "tool_input": {"query": "cruise terminal in Southampton, England"}}]
             ),
         },
-        # convert_nautical_units only (2)
+        # --- Single-tool: convert_nautical_units (Prompts 7–8) ---
+        # Prompt 7: Knots to mph conversion
         {
             "prompt": "Convert 30 knots to miles per hour.",
             "reference_trajectory": json.dumps(
                 [{"tool_name": "convert_nautical_units", "tool_input": {"value": 30, "from_unit": "knots", "to_unit": "mph"}}]
             ),
         },
+        # Prompt 8: Fathoms to meters conversion
         {
             "prompt": "How many meters is 12 fathoms?",
             "reference_trajectory": json.dumps(
                 [{"tool_name": "convert_nautical_units", "tool_input": {"value": 12, "from_unit": "fathoms", "to_unit": "meters"}}]
             ),
         },
-        # Multi-tool chains (3)
+        # --- Multi-tool chains (Prompts 9–11) ---
+        # Prompt 9: Port lookup + weather check (Cozumel)
         {
             "prompt": "Look up the cruise port in Cozumel, Mexico and then check the current weather there.",
             "reference_trajectory": json.dumps(
@@ -353,6 +376,7 @@ def build_eval_dataset() -> pd.DataFrame:
                 ]
             ),
         },
+        # Prompt 10: Unit conversion + speed record search
         {
             "prompt": "Our ship is traveling at 22 knots. Convert that to kilometers per hour, and also search for the current speed record for cruise ships.",
             "reference_trajectory": json.dumps(
@@ -362,6 +386,7 @@ def build_eval_dataset() -> pd.DataFrame:
                 ]
             ),
         },
+        # Prompt 11: Port lookup + weather + unit conversion (Nassau)
         {
             "prompt": "Find the cruise port in Nassau, Bahamas, check the weather at that location, and convert 50 nautical miles to kilometers.",
             "reference_trajectory": json.dumps(
@@ -389,16 +414,17 @@ def main():
     )
     args = parser.parse_args()
 
-    print("=" * 60)
-    print("  Cruise Captain Agent Evaluation")
-    print("=" * 60)
-    print(f"  Project:    {GOOGLE_CLOUD_PROJECT}")
-    print(f"  Location:   {GOOGLE_CLOUD_LOCATION}")
-    print(f"  Experiment: {args.experiment_name}")
-    print("=" * 60)
+    # Header panel
+    config_table = Table(show_header=False, box=None, padding=(0, 2))
+    config_table.add_column("Key", style="bold")
+    config_table.add_column("Value")
+    config_table.add_row("Project", GOOGLE_CLOUD_PROJECT or "N/A")
+    config_table.add_row("Location", GOOGLE_CLOUD_LOCATION)
+    config_table.add_row("Experiment", args.experiment_name)
+    console.print(Panel(config_table, title="Cruise Captain Agent Evaluation", border_style="blue"))
 
     eval_dataset = build_eval_dataset()
-    print(f"\nEval dataset: {len(eval_dataset)} prompts\n")
+    console.print(f"\nEval dataset: [bold]{len(eval_dataset)}[/bold] prompts\n")
 
     trajectory_metrics = [
         "trajectory_exact_match",
@@ -419,36 +445,62 @@ def main():
         experiment=args.experiment_name,
     )
 
-    print("Running evaluation...\n")
+    console.print("[bold cyan]Running evaluation...[/bold cyan]")
     result = eval_task.evaluate(runnable=agent_runnable)
 
-    # Print summary metrics
-    print("\n" + "=" * 60)
-    print("  SUMMARY METRICS")
-    print("=" * 60)
+    # Summary metrics table
     summary = result.summary_metrics
+    summary_table = Table(title="Summary Metrics", box=box.ROUNDED)
+    summary_table.add_column("Metric", style="cyan")
+    summary_table.add_column("Value", justify="right")
+    summary_table.add_column("Threshold", justify="right", style="dim")
+    summary_table.add_column("Status", justify="center")
+
     for metric_name, value in sorted(summary.items()):
-        print(f"  {metric_name:<45} {value}")
+        threshold = THRESHOLDS.get(metric_name)
+        if threshold is not None:
+            passed = value is not None and value >= threshold
+            status = "[green]PASS[/green]" if passed else "[red]FAIL[/red]"
+            threshold_str = str(threshold)
+        else:
+            status = "-"
+            threshold_str = "-"
+        summary_table.add_row(
+            metric_name,
+            f"{value}" if value is not None else "N/A",
+            threshold_str,
+            status,
+        )
 
-    # Print per-row results
-    print("\n" + "=" * 60)
-    print("  PER-ROW RESULTS")
-    print("=" * 60)
+    console.print()
+    console.print(summary_table)
+
+    # Per-row results
+    console.print()
     metrics_df = result.metrics_table
+    metric_cols = [
+        col for col in metrics_df.columns
+        if col not in ("prompt", "response", "reference_trajectory", "predicted_trajectory")
+    ]
+
     for idx, row in metrics_df.iterrows():
-        print(f"\n--- Prompt {idx + 1}: {row.get('prompt', 'N/A')} ---")
+        row_table = Table(show_header=False, box=None, padding=(0, 2))
+        row_table.add_column("Field", style="bold")
+        row_table.add_column("Value")
+
+        prompt_text = str(row.get("prompt", "N/A"))
+        row_table.add_row("Prompt", prompt_text)
+
         if "response" in row:
-            resp_preview = str(row["response"])
-            print(f"  Response: {resp_preview}...")
-        for col in metrics_df.columns:
-            if col not in ("prompt", "response", "reference_trajectory",
-                           "predicted_trajectory"):
-                print(f"  {col}: {row[col]}")
+            row_table.add_row("Response", str(row["response"]))
 
-    print("\n" + "=" * 60)
-    print("  Evaluation complete!")
-    print("=" * 60)
+        for col in metric_cols:
+            val = row[col]
+            row_table.add_row(col, str(val))
 
+        console.print(Panel(row_table, title=f"Prompt {idx + 1}", border_style="dim"))
+
+    console.print()
     if not check_eval_results(result):
         sys.exit(1)
 

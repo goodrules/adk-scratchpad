@@ -17,4 +17,5 @@ dependencies = [
     "tqdm>=4.67.3",
     "uvicorn[standard]>=0.41.0",
     "websockets>=15.0.1",
+    "rich>=13.0.0",
 ]
