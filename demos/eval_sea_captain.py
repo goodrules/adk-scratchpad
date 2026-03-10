@@ -262,17 +262,17 @@ def agent_runnable(prompt: str) -> dict:
 def build_eval_dataset() -> pd.DataFrame:
     """Build eval dataset with prompts and reference trajectories across all tools."""
     data = [
-        # google_search only (2)
+        # google_search_agent only (2)
         {
             "prompt": "Who won the America's Cup sailing race most recently?",
             "reference_trajectory": json.dumps(
-                [{"tool_name": "google_search", "tool_input": {}}]
+                [{"tool_name": "google_search_agent", "tool_input": {"request": "Who won the America's Cup sailing race most recently?"}}]
             ),
         },
         {
             "prompt": "What are the major shipping routes through the Panama Canal?",
             "reference_trajectory": json.dumps(
-                [{"tool_name": "google_search", "tool_input": {}}]
+                [{"tool_name": "google_search_agent", "tool_input": {"request": "major shipping routes through the Panama Canal"}}]
             ),
         },
         # get_weather only (2)
@@ -292,13 +292,13 @@ def build_eval_dataset() -> pd.DataFrame:
         {
             "prompt": "Find information about the cruise port in Miami.",
             "reference_trajectory": json.dumps(
-                [{"tool_name": "lookup_port", "tool_input": {}}]
+                [{"tool_name": "lookup_port", "tool_input": {"query": "cruise port in Miami"}}]
             ),
         },
         {
             "prompt": "Look up the cruise terminal in Southampton, England.",
             "reference_trajectory": json.dumps(
-                [{"tool_name": "lookup_port", "tool_input": {}}]
+                [{"tool_name": "lookup_port", "tool_input": {"query": "cruise terminal in Southampton, England"}}]
             ),
         },
         # convert_nautical_units only (2)
@@ -319,7 +319,7 @@ def build_eval_dataset() -> pd.DataFrame:
             "prompt": "Look up the cruise port in Cozumel, Mexico and then check the current weather there.",
             "reference_trajectory": json.dumps(
                 [
-                    {"tool_name": "lookup_port", "tool_input": {}},
+                    {"tool_name": "lookup_port", "tool_input": {"query": "cruise port in Cozumel, Mexico"}},
                     {"tool_name": "get_weather", "tool_input": {}},
                 ]
             ),
@@ -328,8 +328,8 @@ def build_eval_dataset() -> pd.DataFrame:
             "prompt": "Our ship is traveling at 22 knots. Convert that to kilometers per hour, and also search for the current speed record for cruise ships.",
             "reference_trajectory": json.dumps(
                 [
-                    {"tool_name": "convert_nautical_units", "tool_input": {}},
-                    {"tool_name": "google_search", "tool_input": {}},
+                    {"tool_name": "convert_nautical_units", "tool_input": {"value": 22, "from_unit": "knots", "to_unit": "kph"}},
+                    {"tool_name": "google_search_agent", "tool_input": {"request": "current speed record for cruise ships"}},
                 ]
             ),
         },
@@ -337,9 +337,9 @@ def build_eval_dataset() -> pd.DataFrame:
             "prompt": "Find the cruise port in Nassau, Bahamas, check the weather at that location, and convert 50 nautical miles to kilometers.",
             "reference_trajectory": json.dumps(
                 [
-                    {"tool_name": "lookup_port", "tool_input": {}},
+                    {"tool_name": "lookup_port", "tool_input": {"query": "cruise port in Nassau, Bahamas"}},
                     {"tool_name": "get_weather", "tool_input": {}},
-                    {"tool_name": "convert_nautical_units", "tool_input": {}},
+                    {"tool_name": "convert_nautical_units", "tool_input": {"value": 50, "from_unit": "nautical_miles", "to_unit": "km"}},
                 ]
             ),
         },
