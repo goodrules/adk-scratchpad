@@ -208,3 +208,6 @@ GEMINI.md
 CLAUDE.md
 local
 toolbox
+
+# Chainlit
+.chainlit/

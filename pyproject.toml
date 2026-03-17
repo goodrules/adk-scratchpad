@@ -18,4 +18,5 @@ dependencies = [
     "uvicorn[standard]>=0.41.0",
     "websockets>=15.0.1",
     "rich>=13.0.0",
+    "chainlit>=2.10.0",
 ]
