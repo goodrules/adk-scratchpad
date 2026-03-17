@@ -3,6 +3,7 @@
 Run with: chainlit run app.py -w
 """
 
+import urllib.parse
 import uuid
 
 import chainlit as cl
@@ -19,6 +20,15 @@ from agent import root_agent
 session_service = InMemorySessionService()
 
 
+def clean_uri(uri: str) -> str:
+    """Clean URI for web display (convert gs://, encode spaces)."""
+    if not uri:
+        return ""
+    if uri.startswith("gs://"):
+        uri = uri.replace("gs://", "https://storage.cloud.google.com/", 1)
+    return uri.replace(" ", "%20")
+
+
 def format_grounding_sources(grounding_metadata) -> str:
     """Format grounding chunks as Markdown source links."""
     lines = []
@@ -26,14 +36,14 @@ def format_grounding_sources(grounding_metadata) -> str:
         ctx = chunk.retrieved_context
         if ctx:
             title = ctx.title or ctx.document_name or f"Source {i}"
-            uri = ctx.uri or ""
+            uri = clean_uri(ctx.uri or "")
             if uri:
                 lines.append(f"- [{title}]({uri})")
             else:
                 lines.append(f"- {title}")
         elif chunk.web:
             title = chunk.web.title or f"Source {i}"
-            uri = chunk.web.uri or ""
+            uri = clean_uri(chunk.web.uri or "")
             if uri:
                 lines.append(f"- [{title}]({uri})")
             else:
@@ -59,14 +69,14 @@ def format_detailed_metadata(grounding_metadata) -> str:
             if ctx:
                 sections.append(f"\n**[{i}] {ctx.title or ctx.document_name or 'Untitled'}**")
                 if ctx.uri:
-                    sections.append(f"  URI: {ctx.uri}")
+                    sections.append(f"  URI: {clean_uri(ctx.uri)}")
                 if ctx.text:
                     snippet = ctx.text[:300] + "..." if len(ctx.text) > 300 else ctx.text
                     sections.append(f"  > {snippet}")
             elif chunk.web:
                 sections.append(f"\n**[{i}] {chunk.web.title or 'Untitled'}**")
                 if chunk.web.uri:
-                    sections.append(f"  URI: {chunk.web.uri}")
+                    sections.append(f"  URI: {clean_uri(chunk.web.uri)}")
 
     # Grounding supports (text-to-source mappings)
     if grounding_metadata.grounding_supports:
@@ -75,7 +85,7 @@ def format_detailed_metadata(grounding_metadata) -> str:
             text = support.segment.text if support.segment else ""
             indices = support.grounding_chunk_indices or []
             scores = support.confidence_scores or []
-            score_str = ", ".join(f"{s:.2f}" for s in scores)
+            score_str = ", ".join(f"{s:.2f}" for s in scores) if scores else "N/A"
             sections.append(f'- "{text}" -> chunks {list(indices)} (confidence: {score_str})')
 
     return "\n".join(sections) if sections else "No detailed metadata available."
@@ -139,16 +149,7 @@ async def on_message(message: cl.Message):
         async with cl.Step(name="View Grounding Metadata", type="tool") as step:
             step.output = format_detailed_metadata(grounding_metadata)
 
-        # Reach goal: PDF side-panel elements
-        for chunk in grounding_metadata.grounding_chunks:
-            ctx = chunk.retrieved_context
-            if ctx and ctx.uri and ctx.uri.endswith(".pdf"):
-                elements.append(
-                    cl.Pdf(
-                        name=ctx.title or "Document",
-                        url=ctx.uri,
-                        display="side",
-                    )
-                )
+        # PDF side-panel framing removed to avoid '*/*' MIME type browser 
+        # console errors, as GCS private URLs fail to load in iframes (403).
 
     await cl.Message(content=response_text, elements=elements).send()

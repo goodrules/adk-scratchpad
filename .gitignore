@@ -211,3 +211,4 @@ toolbox
 
 # Chainlit
 .chainlit/
+tests/*
