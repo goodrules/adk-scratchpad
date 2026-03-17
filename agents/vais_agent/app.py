@@ -37,6 +37,17 @@ def format_grounding_sources(grounding_metadata) -> str:
         if ctx:
             title = ctx.title or ctx.document_name or f"Source {i}"
             uri = clean_uri(ctx.uri or "")
+            
+            # Extract page number if available
+            page = None
+            if hasattr(ctx, "rag_chunk") and ctx.rag_chunk and hasattr(ctx.rag_chunk, "page_span") and ctx.rag_chunk.page_span:
+                page = ctx.rag_chunk.page_span.first_page
+                
+            if page:
+                title = f"{title} (Page {page})"
+                if uri:
+                    uri = f"{uri}#page={page}"
+                    
             if uri:
                 lines.append(f"- [{title}]({uri})")
             else:
@@ -67,9 +78,17 @@ def format_detailed_metadata(grounding_metadata) -> str:
         for i, chunk in enumerate(grounding_metadata.grounding_chunks, 1):
             ctx = chunk.retrieved_context
             if ctx:
-                sections.append(f"\n**[{i}] {ctx.title or ctx.document_name or 'Untitled'}**")
+                page = None
+                if hasattr(ctx, "rag_chunk") and ctx.rag_chunk and hasattr(ctx.rag_chunk, "page_span") and ctx.rag_chunk.page_span:
+                    page = ctx.rag_chunk.page_span.first_page
+                    
+                title_suffix = f" (Page {page})" if page else ""
+                sections.append(f"\n**[{i}] {ctx.title or ctx.document_name or 'Untitled'}{title_suffix}**")
                 if ctx.uri:
-                    sections.append(f"  URI: {clean_uri(ctx.uri)}")
+                    uri = clean_uri(ctx.uri)
+                    if page:
+                        uri = f"{uri}#page={page}"
+                    sections.append(f"  URI: {uri}")
                 if ctx.text:
                     snippet = ctx.text[:300] + "..." if len(ctx.text) > 300 else ctx.text
                     sections.append(f"  > {snippet}")
@@ -120,7 +139,10 @@ async def on_message(message: cl.Message):
     runner: Runner = cl.user_session.get("runner")
     session_id: str = cl.user_session.get("session_id")
 
-    response_text = ""
+    msg = cl.Message(content="")
+    await msg.send()
+
+    final_text = ""
     grounding_metadata = None
 
     async for event in runner.run_async(
@@ -128,22 +150,28 @@ async def on_message(message: cl.Message):
         session_id=session_id,
         new_message=types.Content(parts=[types.Part(text=message.content)]),
     ):
-        # Collect text from non-partial events
+        # Collect text from non-partial events and stream partials
         if event.content and event.content.parts:
             for part in event.content.parts:
-                if part.text and not event.partial:
-                    response_text += part.text
+                if part.text:
+                    if event.partial:
+                        await msg.stream_token(part.text)
+                    else:
+                        final_text += part.text
 
         # Capture grounding metadata
         if event.grounding_metadata:
             grounding_metadata = event.grounding_metadata
+
+    if final_text:
+        msg.content = final_text
 
     # Build source links and collapsible step
     elements = []
     if grounding_metadata and grounding_metadata.grounding_chunks:
         sources_md = format_grounding_sources(grounding_metadata)
         if sources_md:
-            response_text += "\n\n---\n**Sources:**\n" + sources_md
+            msg.content += "\n\n---\n**Sources:**\n" + sources_md
 
         # Collapsible step with full metadata details
         async with cl.Step(name="View Grounding Metadata", type="tool") as step:
@@ -152,4 +180,5 @@ async def on_message(message: cl.Message):
         # PDF side-panel framing removed to avoid '*/*' MIME type browser 
         # console errors, as GCS private URLs fail to load in iframes (403).
 
-    await cl.Message(content=response_text, elements=elements).send()
+    msg.elements = elements
+    await msg.update()
