@@ -2,7 +2,7 @@
 
 **Objective:** By the end of this guide, you will have a working environment for the Google Agent Development Kit (ADK), created your first agent, connected it to external tools (including the Model Context Protocol), and orchestrated complex workflows.
 
-**Target Model:** `gemini-3-pro-preview`
+**Target Model:** `gemini-3.1-pro-preview`
 **Platform:** Google Cloud Vertex AI
 
 -----
@@ -61,7 +61,7 @@ from google.adk.agents.llm_agent import Agent
 
 root_agent = Agent(
     name="helper_agent",
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     description="A helpful assistant for engineering tasks.",
     instruction="You are a helpful AI assistant. Answer queries concisely and technically.",
 )
@@ -134,7 +134,7 @@ def convert_temperature(value: float, from_scale: str, to_scale: str) -> float:
 # 2. Register it
 root_agent = Agent(
     name="utility_agent",
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     instruction="You are a utility assistant. Use 'convert_temperature' to answer queries. Understand that 'F' and 'Fahrenheit', 'C' and 'Celsius', 'K' and 'Kelvin' are interchangeable.",
     tools=[convert_temperature]
     # Note: 'description' parameter is primarily used for multi-agent routing
@@ -150,7 +150,7 @@ from google.adk.tools import GoogleSearchTool
 
 root_agent = Agent(
     name="researcher",
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     instruction="You are a researcher. Use Google Search to find citations.",
     tools=[GoogleSearchTool()]
 )
@@ -194,7 +194,7 @@ fs_mcp_toolset = McpToolset(
 # 3. Create the Agent
 root_agent = Agent(
     name="fs_agent",
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     instruction="""
     You are a file system assistant.
     You can read/write files in the workspace.
@@ -224,7 +224,7 @@ from google.adk.tools import google_search
 # Step 1: Researcher (Uses Tools)
 researcher = Agent(
     name="researcher",
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     instruction="Find 3 recent breakthroughs in the user provided topic using Google Search.",
     tools=[google_search]
 )
@@ -232,7 +232,7 @@ researcher = Agent(
 # Step 2: Writer (Pure Reasoning)
 writer = Agent(
     name="writer",
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     instruction="Summarize the provided research into a generic blog post format."
 )
 
@@ -259,14 +259,14 @@ from google.adk.agents.llm_agent import Agent
 # Specialist 1
 sec_analyst = Agent(
     name="sec_analyst",
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     instruction="Analyze the code strictly for security vulnerabilities (SQLi, XSS)."
 )
 
 # Specialist 2
 perf_analyst = Agent(
     name="perf_analyst",
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     instruction="Analyze the code strictly for performance bottlenecks (O(n) complexity)."
 )
 
@@ -279,7 +279,7 @@ review_board = ParallelAgent(
 # Consolidator (Merges the parallel outputs)
 lead_engineer = Agent(
     name="lead_engineer",
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     instruction="Synthesize the security and performance reports into a final verdict."
 )
 
@@ -310,14 +310,14 @@ def exit_loop(tool_context: ToolContext):
 # 2. Writer generates content
 writer = Agent(
     name="content_writer",
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     instruction="Write a technical blog post on the given topic."
 )
 
 # 3. Critic evaluates quality and can exit loop
 critic = Agent(
     name="content_critic",
-    model="gemini-3-pro-preview",
+    model="gemini-3.1-pro-preview",
     instruction="""Review the content for quality.
     If quality score >= 8/10, call the 'exit_loop' function to stop iteration.
     If quality score < 8/10, provide specific improvement suggestions.""",
@@ -373,7 +373,7 @@ Error: Could not automatically determine credentials.
 
 #### **Model Not Found**
 ```
-Error: Model 'gemini-3-pro-preview' not found
+Error: Model 'gemini-3.1-pro-preview' not found
 ```
 **Solution:** Verify the model is available in your region. Check `GOOGLE_CLOUD_LOCATION` is set to `global`.
 

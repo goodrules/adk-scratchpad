@@ -313,9 +313,9 @@ CODE_EXEC_MODEL = "gemini-2.5-pro"
 IMAGE_MODEL = "gemini-3-pro-image-preview"  # Gemini 3 for native image generation
 
 # Option 2: Gemini 3 Pro Preview (latest features, may have availability issues)
-# FAST_MODEL = "gemini-3-pro-preview"
-# PRO_MODEL = "gemini-3-pro-preview"
-# CODE_EXEC_MODEL = "gemini-3-pro-preview"
+# FAST_MODEL = "gemini-3.1-pro-preview"
+# PRO_MODEL = "gemini-3.1-pro-preview"
+# CODE_EXEC_MODEL = "gemini-3.1-pro-preview"
 # IMAGE_MODEL = "gemini-3-pro-image-preview"
 
 # Option 3: Gemini 2.5 Flash (fastest, lowest cost)
