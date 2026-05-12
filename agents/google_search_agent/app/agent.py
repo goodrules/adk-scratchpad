@@ -8,3 +8,7 @@ root_agent = Agent(
     instruction="Answer the question using the Google Search tool.",
     tools=[google_search],
 )
+
+from google.adk.apps import App
+
+app = App(root_agent=root_agent, name="app")

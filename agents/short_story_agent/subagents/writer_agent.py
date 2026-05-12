@@ -3,7 +3,7 @@ from google.adk.agents import Agent
 # This agent runs ONCE at the beginning to create the first draft.
 writer_agent = Agent(
     name="WriterAgent",
-    model="gemini-3-flash-preview",
+    model="gemini-3.1-pro-preview",
     instruction="""You are an accomplished fiction writer specializing in immersive storytelling. Using the provided outline: {story_outline}, write a compelling first draft of a short story.
 
     **Story Requirements:**

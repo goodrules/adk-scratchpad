@@ -1,8 +1,9 @@
 from google.adk.agents import Agent
+from google.adk.models import Claude
 
 editor_agent = Agent(
     name="EditorAgent",
-    model="gemini-3-flash-preview",
+    model=Claude(model="claude-sonnet-4-6"),
     instruction="""You are an experienced story editor with a keen eye for craft. Review the story provided below with balanced attention to all storytelling elements.
 
     Story: {current_story}
