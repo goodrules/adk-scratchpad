@@ -3,9 +3,9 @@ services:
     image: postgres:16
     container_name: software-bug-assistant-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: ticketsdb
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-admin}
+      POSTGRES_DB: ${DB_NAME:-ticketsdb}
     ports:
       - "5432:5432"
     volumes:

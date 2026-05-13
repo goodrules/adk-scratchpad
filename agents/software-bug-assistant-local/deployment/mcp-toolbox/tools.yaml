@@ -2,11 +2,11 @@ sources:
   postgresql: # LOCAL
 
     kind: postgres
-    host: 127.0.0.1
-    port: 5432
-    database: ticketsdb
-    user: postgres
-    password: admin
+    host: ${DB_HOST:-127.0.0.1}
+    port: ${DB_PORT:-5432}
+    database: ${DB_NAME:-ticketsdb}
+    user: ${DB_USER:-postgres}
+    password: ${DB_PASSWORD:-admin}
 
 tools:
   search-tickets:
@@ -40,7 +40,7 @@ tools:
       - name: assignee
         type: string
         description: The email of the assignee.
-    statement: SELECT * FROM tickets WHERE assignee ILIKE '%' || $1 || '%';
+    statement: SELECT * FROM tickets WHERE assignee ILIKE '%' || $1 || '%' LIMIT 20;
   update-ticket-priority:
     kind: postgres-sql
     source: postgresql
@@ -73,7 +73,7 @@ tools:
       - name: status
         type: string
         description: The status of the tickets to retrieve (e.g., 'Open', 'In Progress', 'Closed', 'Resolved').
-    statement: SELECT * FROM tickets WHERE status ILIKE '%' || $1 || '%';
+    statement: SELECT * FROM tickets WHERE status ILIKE '%' || $1 || '%' LIMIT 20;
   get-tickets-by-priority:
     kind: postgres-sql
     source: postgresql
@@ -82,7 +82,7 @@ tools:
       - name: priority
         type: string
         description: The priority of the tickets to retrieve (e.g., 'P0 - Critical', 'P1 - High', 'P2 - Medium', 'P3 - Low').
-    statement: SELECT * FROM tickets WHERE priority ILIKE '%' || $1 || '%';
+    statement: SELECT * FROM tickets WHERE priority ILIKE '%' || $1 || '%' LIMIT 20;
   create-new-ticket:
     kind: postgres-sql
     source: postgresql
@@ -118,7 +118,7 @@ tools:
       - name: date_field
         type: string
         description: The date field to filter by ('creation_time' or 'updated_time').
-    statement: SELECT * FROM tickets WHERE CASE WHEN $3 = 'creation_time' THEN creation_time ELSE updated_time END BETWEEN $1::timestamp AND $2::timestamp;
+    statement: SELECT * FROM tickets WHERE CASE WHEN $3 = 'creation_time' THEN creation_time ELSE updated_time END BETWEEN $1::timestamp AND $2::timestamp LIMIT 20;
 
 toolsets:
   tickets_toolset:

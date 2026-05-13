@@ -13,6 +13,7 @@
 # limitations under the License.
 # add docstring to this module
 
+import logging
 import os
 from datetime import datetime
 
@@ -35,6 +36,8 @@ from google.adk.tools.mcp_tool import MCPToolset, StreamableHTTPConnectionParams
 from langchain_community.tools import StackExchangeTool
 from langchain_community.utilities import StackExchangeAPIWrapper
 from toolbox_core import ToolboxSyncClient
+
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -74,7 +77,7 @@ try:
     toolbox = ToolboxSyncClient(TOOLBOX_URL)
     toolbox_tools = toolbox.load_toolset(TOOLBOX_TOOLSET_NAME)
 except Exception:
-    # Toolbox server not available, set to empty list
+    logger.warning("MCP Toolbox at %s not available — database tools disabled", TOOLBOX_URL, exc_info=True)
     toolbox_tools = []
 
 
@@ -92,5 +95,5 @@ try:
         tool_filter=GITHUB_MCP_TOOL_FILTER,
     )
 except Exception:
-    # GitHub MCP server not available or token missing
+    logger.warning("GitHub MCP tools not available — check GITHUB_PERSONAL_ACCESS_TOKEN", exc_info=True)
     mcp_tools = None
